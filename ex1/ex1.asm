@@ -3,10 +3,10 @@
 .section .text
 _start:
 movq $0, Legal
-Movq Adress, %r9
+movq Adress, %r9
 movq length, %r10
 movq Index, %r11
-cmpq %r11, %r10
+cmpq %r10, %r11
 jae end
 
 movq $1, Legal
