@@ -1,0 +1,23 @@
+.global _start
+
+.section .text
+
+  mov $seconddegree, %rax
+  cmpl $1, (%rax)
+  jne bad_exit
+
+  movq $60, %rax
+  movq $0, %rdi
+  syscall
+
+bad_exit:
+  movq $60, %rax
+  movq $1, %rdi
+  syscall
+
+.section .data
+series: .int -7
+
+size: .int 1
+
+seconddegree: .byte 0

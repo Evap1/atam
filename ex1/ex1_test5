@@ -1,0 +1,35 @@
+.global _start
+
+.section .text
+  mov $Legal, %rax
+  cmpl $0, (%rax)
+  jne bad_exit
+  
+  movq $60, %rax
+  movq $0, %rdi
+  syscall
+
+bad_exit:
+  movq $60, %rax
+  movq $1, %rdi
+  syscall
+
+.section .data
+array_start:
+    .int 1
+    .int 2
+    .int 3
+    .int 4
+    .int 5
+array_end:
+
+Adress:
+    .quad array_start          # address of the first element in the array
+Index:
+    .quad -7                    # example index
+length:
+    .quad 5                    # length of the array
+Legal:
+    .quad 0                    # flag to indicate if operation is Legal
+num:
+    .quad 0                    # variable to store the result
