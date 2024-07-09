@@ -21,9 +21,9 @@ loop_zeros:
     jb loop_zeros            # index < size
 
     cmpw $3, type            # Compare type with 3
-    je exit                  # Exit if type is 3
+    je end                   # Exit if type is 3
 
-    movw $1, type
+    movw $1, type            # Initialize type to 1 for simple set check
 
 loop_simple:
     movq $0, %r11            # Reset index to 0
@@ -49,7 +49,6 @@ check_simple_char:
     cmpb $'9', %al
     jbe simple_char
 
-
     # Check if character is punctuation (',', '.', '?', '!', ' ')
     cmpb $33, %al    # ASCII value of '!' is 33
     je simple_char
@@ -73,7 +72,7 @@ simple_char:
 
 end_simple_check:
     cmpw $1, type            # Check if type is 1
-    je exit                  # Exit if type is 1
+    je end                   # Exit if type is 1
 
 loop_science:
     movq $0, %r11            # Reset index to 0
@@ -100,7 +99,7 @@ not_science:
 update_type4:
     movq $4, type            # Set type to 4
 
-exit:
+end:
     mov $60, %rax            # exit system call
     xor %rdi, %rdi           # status 0
     syscall
