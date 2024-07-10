@@ -2,14 +2,17 @@
 
 .section .text
 _start:
-    movw $3, type            # Initialize type to 3
+    movb $3, type            # Initialize type to 3
     movq size, %r9           # Load size into r9
+    subq $1 , %r9
     movq data, %r10          # Load address of data into r10
     movq size, %r13          # Load size into r13
     shrq $3, %r13            # Divide size by 8 (size/8)
     andq $7, %r9             # r9 = r9 & 7 (check if size is divisible by 8)
     testq %r9, %r9           # Update ZF based on r9
     je loop_zeros            # Jump if size is divisible by 8
+
+
 
 loop_zeros:
     movq $0, %r11
@@ -20,22 +23,28 @@ loop_zeros:
     cmpq %r11, %r13          # Compare r11 with r13
     jb loop_zeros            # Loop if index < size
 
-    cmpw $3, type            # Compare type with 3
+    cmpb $3, type            # Compare type with 3
     je end                   # Exit if type is 3
 
+    
+    movb (%r10, %r9, 1), %al   # Load byte from data
+    cmpb $0, %al             # Check if null terminator
+    jne update_type4
+
+
 update_type1:
-    movw $1, type            # Initialize type to 1 for simple set check
+    movb $1, type            # Initialize type to 1 for simple set check
 
 loop_simple:
     movq $0, %r11            # Reset index to 0
 
 check_simple_char:
-    cmpq %r11, size          # Compare index with size to ensure bounds
-    jge end_simple_check     # Exit loop if index >= size
+    cmpq %r11, %r9          # Compare index with size to ensure bounds
+    je end_simple_check     # Exit loop if index = size-1
 
     movb (%r10, %r11, 1), %al   # Load byte from data
-    cmpb $0, %al             # Check if null terminator
-    je end_simple_check
+    cmpb $0, %al       # Check if null terminator
+    je update_type4
 
     # Check if character is punctuation (',', '.', '?', '!', ' ')
     cmpb $33, %al    # ASCII value of '!' is 33
@@ -66,9 +75,8 @@ check_simple_char:
     jbe simple_char
 
 
-
 not_simple:
-    movw $2, type            # Set type to 2
+    movb $2, type            # Set type to 2
     jmp end_simple_check     # Jump to end check
 
 simple_char:
@@ -76,35 +84,32 @@ simple_char:
     jmp check_simple_char    # Loop to check next character
 
 end_simple_check:
-    cmpw $1, type            # Check if type is 1
+    cmpb $1, type            # Check if type is 1
     je end                   # Exit if type is 1
+
 
 loop_science:
     movq $0, %r11            # Reset index to 0
 
 check_science_char:
-    cmpq %r11, size          # Compare index with size to ensure bounds
-    jge end_science_check    # Exit loop if index >= size
+    cmpq %r11, %r9          # Compare index with size to ensure bounds
+    je end                  # Exit loop if index = size-1
 
-    movb (%r10, %r11), %al   # Load byte from data
-    cmpb $0, %al             # Check if null terminator
-    je end_science_check
+    movb (%r10, %r11, 1), %al   # Load byte from data
+
     cmpb $32, %al
-    jb not_science           # Check if character < 32
+    jg not_science           # Check if character < 32
     cmpb $126, %al
-    ja not_science           # Check if character > 126
+    jb not_science           # Check if character > 126
 
     incq %r11                # Increment index
     jmp check_science_char   # Loop if index < size
 
-end_science_check:
-    jmp update_type4         # Go to update type 4
-
 not_science:
-    movw $4, type            # Set type to 4
+    movb $4, type            # Set type to 4
 
 update_type4:
-    movw $4, type            # Set type to 4
+    movb $4, type            # Set type to 4
 
 end:
     # pseudo code
