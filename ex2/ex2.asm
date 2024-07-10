@@ -16,7 +16,7 @@ _start:
 
 loop_zeros:
     movq $0, %r11
-    movq (%r10, %r11, 8), %r12 # Load quad from data using base=data and iterator=R11
+    movq 0(%r10, %r11, 8), %r12 # Load quad from data using base=data and iterator=R11
     testq %r12, %r12         # Check if quad value is 0
     je update_type1
     addq $1, %r11            # I++
@@ -27,7 +27,7 @@ loop_zeros:
     je end                   # Exit if type is 3
 
     
-    movb (%r10, %r9, 1), %al   # Load byte from data
+    movb 0(%r10, %r9, 1), %al   # Load byte from data
     cmpb $0, %al             # Check if null terminator
     jne update_type4
 
