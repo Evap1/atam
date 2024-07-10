@@ -177,4 +177,3 @@ newline:
 
 .section .bss
     .lcomm type_buf, 13      # buffer to hold string representation of type
-    .lcomm type, 2           # reserve 2 bytes for type in the BSS section
