@@ -105,11 +105,10 @@ end:
     # if size%8 == 0
     #   for I in size%8
     #       if data[I] == 0
-    #           type = 4
+    #           type = 1
     # if type = 3 : end
     #
     # loop_simple:
-    # type = 1
     # for I in size:
     #   if data[I] is not in simple set
     #       type = 2
