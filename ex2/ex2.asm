@@ -33,25 +33,9 @@ check_simple_char:
     cmpq %r11, size          # Compare index with size to ensure bounds
     jge end_simple_check     # Exit loop if index >= size
 
-    movb (%r10, %r11), %al   # Load byte from data
+    movb (%r10, %r11, 1), %al   # Load byte from data
     cmpb $0, %al             # Check if null terminator
     je end_simple_check
-
-    # Check if character is a letter (A-Z or a-z)
-    cmpb $'A', %al
-    jb not_simple
-    cmpb $'Z', %al
-    jbe simple_char
-    cmpb $'a', %al
-    jb not_simple
-    cmpb $'z', %al
-    jbe simple_char
-
-    # Check if character is a digit (0-9)
-    cmpb $'0', %al
-    jb not_simple
-    cmpb $'9', %al
-    jbe simple_char
 
     # Check if character is punctuation (',', '.', '?', '!', ' ')
     cmpb $33, %al    # ASCII value of '!' is 33
@@ -64,6 +48,24 @@ check_simple_char:
     je simple_char
     cmpb $32, %al    # ASCII value of space ' ' is 32
     je simple_char
+
+    # Check if character is a digit (0-9)
+    cmpb $'0', %al
+    jg not_simple
+    cmpb $'9', %al
+    jbe simple_char
+
+    # Check if character is a letter (A-Z or a-z)
+    cmpb $'A', %al
+    jg not_simple
+    cmpb $'Z', %al
+    jbe simple_char
+    cmpb $'a', %al
+    jg not_simple
+    cmpb $'z', %al
+    jbe simple_char
+
+
 
 not_simple:
     movw $2, type            # Set type to 2
