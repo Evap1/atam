@@ -13,12 +13,12 @@ _start:
 
 loop_zeros:
     movq $0, %r11
-    movq (%r10, %r11, 8), %r12 # Iterates data using base=data and iterator=R11
+    movq (%r10, %r11, 8), %r12 # Load quad from data using base=data and iterator=R11
     testq %r12, %r12         # Check if quad value is 0
     je update_type1
     addq $1, %r11            # I++
-    cmpq %r11, %r13          # r11 - r13
-    jb loop_zeros            # index < size
+    cmpq %r11, %r13          # Compare r11 with r13
+    jb loop_zeros            # Loop if index < size
 
     cmpw $3, type            # Compare type with 3
     je end                   # Exit if type is 3
@@ -178,5 +178,3 @@ newline:
 .section .bss
     .lcomm type_buf, 13      # buffer to hold string representation of type
     .lcomm type, 2           # reserve 2 bytes for type in the BSS section
-    .lcomm size, 8           # reserve 8 bytes for size in the BSS section
-    .lcomm data, 8           # reserve 8 bytes for data pointer in the BSS section
