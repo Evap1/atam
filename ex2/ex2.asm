@@ -3,14 +3,13 @@
 .section .text
 _start:
     movb $3, type            # Initialize type to 3
-    movq size, %r9           # Load size into r9 V
-    subq $1 , %r9 			 # V
+    movq size, %r9           # Load size into r9 V		
     leaq data, %r10          # Load address of data into r10 (movq loads the first quad in 
     movq size, %r13          # Load size into r13 V
-    shrq $3, %r13            # Divide size by 8 (size/8)
+    shrq $3, %r13           # Divide size by 8 (size/8)
     andq $7, %r9             # r9 = r9 & 7 (check if size is divisible by 8)
     testq %r9, %r9           # Update ZF based on r9
-    jne update_type1         # if not divisible jump to check simple condition
+    jne update_type1            # if not divisible jump to check simple condition
 
 loop_zeros:
     movq $0, %r11
@@ -27,9 +26,10 @@ loop_zeros:
 
 update_type1:
     movb $1, type            # Initialize type to 1 for simple set check
-
+    movq size, %r9           # reset size value into r9 
+    subq $1 , %r9 
     movb (%r10, %r9, 1), %al   # Load byte from data
-    cmpb $0, %al               # Check if null terminator
+    cmpb $0, %al             # Check if null terminator
     jne update_type4
     subq $1 , %r9
 
@@ -97,9 +97,9 @@ check_science_char:
     movb (%r10, %r11, 1), %al   # Load byte from data
 
     cmpb $32, %al
-    jb not_science           # if char < 32 it-s out of range
+    jg not_science           # Check if character < 32
     cmpb $126, %al
-    ja not_science           # if char > 126 it-s out of range
+    jb not_science           # Check if character > 126
 
     incq %r11                # Increment index
     jmp check_science_char   # Loop if index < size
