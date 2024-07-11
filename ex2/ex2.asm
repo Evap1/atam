@@ -3,16 +3,13 @@
 .section .text
 _start:
     movb $3, type            # Initialize type to 3
-    movq size, %r9           # Load size into r9
-    subq $1 , %r9
-    movq data, %r10          # Load address of data into r10
-    movq size, %r13          # Load size into r13
-    shrq $3, %r13            # Divide size by 8 (size/8)
+    movq size, %r9           # Load size into r9 V		
+    leaq data, %r10          # Load address of data into r10 (movq loads the first quad in 
+    movq size, %r13          # Load size into r13 V
+    shrq $3, %r13           # Divide size by 8 (size/8)
     andq $7, %r9             # r9 = r9 & 7 (check if size is divisible by 8)
     testq %r9, %r9           # Update ZF based on r9
-    je loop_zeros            # Jump if size is divisible by 8
-
-
+    jne update_type1            # if not divisible jump to check simple condition
 
 loop_zeros:
     movq $0, %r11
@@ -26,14 +23,16 @@ loop_zeros:
     cmpb $3, type            # Compare type with 3
     je end                   # Exit if type is 3
 
-    
-    movb 0(%r10, %r9, 1), %al   # Load byte from data
-    cmpb $0, %al             # Check if null terminator
-    jne update_type4
-
 
 update_type1:
     movb $1, type            # Initialize type to 1 for simple set check
+    movq size, %r9           # reset size value into r9 
+    subq $1 , %r9 
+    movb (%r10, %r9, 1), %al   # Load byte from data
+    cmpb $0, %al             # Check if null terminator
+    jne update_type4
+    subq $1 , %r9
+
 
 loop_simple:
     movq $0, %r11            # Reset index to 0
@@ -41,7 +40,7 @@ loop_simple:
 check_simple_char:
     cmpq %r11, %r9          # Compare index with size to ensure bounds
     je end_simple_check     # Exit loop if index = size-1
-
+ 
     movb (%r10, %r11, 1), %al   # Load byte from data
     cmpb $0, %al       # Check if null terminator
     je update_type4
@@ -59,19 +58,19 @@ check_simple_char:
     je simple_char
 
     # Check if character is a digit (0-9)
-    cmpb $'0', %al
-    jg not_simple
+    cmpb $'0', %al     		# if ‘0’ > char then its not simple.
+    jb not_simple
     cmpb $'9', %al
-    jbe simple_char
+    jbe simple_char		# if ‘9’ > char then its simple. ( 0 < char < 9)
 
     # Check if character is a letter (A-Z or a-z)
-    cmpb $'A', %al
-    jg not_simple
-    cmpb $'Z', %al
+    cmpb $'A', %al			# if ‘A’ > char then its not simple.
+    jb not_simple
+    cmpb $'Z', %al			# if ‘Z’ > char then its simple. ( ‘A’ < char < ‘Z’)
     jbe simple_char
-    cmpb $'a', %al
-    jg not_simple
-    cmpb $'z', %al
+    cmpb $'a', %al			# if ‘a’ > char then its not simple.
+    jb not_simple
+    cmpb $'z', %al			# if ‘a’ > char then its simple. ( ‘a’ < char < ‘a’)
     jbe simple_char
 
 
@@ -98,9 +97,9 @@ check_science_char:
     movb (%r10, %r11, 1), %al   # Load byte from data
 
     cmpb $32, %al
-    jg not_science           # Check if character < 32
+    jb not_science           # Check if character < 32
     cmpb $126, %al
-    jb not_science           # Check if character > 126
+    jg not_science           # Check if character > 126
 
     incq %r11                # Increment index
     jmp check_science_char   # Loop if index < size
