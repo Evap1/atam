@@ -3,9 +3,9 @@
 .section .text
 _start:
     movb $3, type            # Initialize type to 3
-    movq size(%rip), %r9     # Load size into r9
+    movq size, %r9     # Load size into r9
     subq $1 , %r9
-    movq data(%rip), %r10          # Load address of data into r10
+    movq data, %r10          # Load address of data into r10
     movq size, %r13          # Load size into r13
     shrq $3, %r13            # Divide size by 8 (size/8)
     andq $7, %r9             # r9 = r9 & 7 (check if size is divisible by 8)
