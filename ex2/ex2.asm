@@ -5,35 +5,34 @@ _start:
     movb $3, type            # Initialize type to 3
     movq size, %r9           # Load size into r9
     subq $1 , %r9
-    movq data, %r10          # Load address of data into r10
+    leaq data, %r10          # Load address of data into r10 (movq loads the first quad in 
     movq size, %r13          # Load size into r13
     shrq $3, %r13            # Divide size by 8 (size/8)
     andq $7, %r9             # r9 = r9 & 7 (check if size is divisible by 8)
     testq %r9, %r9           # Update ZF based on r9
-    je loop_zeros            # Jump if size is divisible by 8
-
-
+    jne update_type1            # if not divisible jump to check simple condition
 
 loop_zeros:
     movq $0, %r11
     movq 0(%r10, %r11, 8), %r12 # Load quad from data using base=data and iterator=R11
     testq %r12, %r12         # Check if quad value is 0
     je update_type1
-    addq $8, %r11            # I++
+    addq $1, %r11            # I++
     cmpq %r11, %r13          # Compare r11 with r13
     jb loop_zeros            # Loop if index < size
 
     cmpb $3, type            # Compare type with 3
     je end                   # Exit if type is 3
 
-    
-    movb 0(%r10, %r9, 1), %al   # Load byte from data
-    cmpb $0, %al             # Check if null terminator
-    jne update_type4
-
 
 update_type1:
     movb $1, type            # Initialize type to 1 for simple set check
+
+    movb (%r10, %r9, 1), %al   # Load byte from data
+    cmpb $0, %al             # Check if null terminator
+    jne update_type4
+    subq $1 , %r9
+
 
 loop_simple:
     movq $0, %r11            # Reset index to 0
@@ -41,7 +40,7 @@ loop_simple:
 check_simple_char:
     cmpq %r11, %r9          # Compare index with size to ensure bounds
     je end_simple_check     # Exit loop if index = size-1
-
+ 
     movb (%r10, %r11, 1), %al   # Load byte from data
     cmpb $0, %al       # Check if null terminator
     je update_type4
