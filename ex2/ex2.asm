@@ -19,7 +19,7 @@ loop_zeros:
     movq 0(%r10, %r11, 8), %r12 # Load quad from data using base=data and iterator=R11
     testq %r12, %r12         # Check if quad value is 0
     je update_type1
-    addq $1, %r11            # I++
+    addq $8, %r11            # I++
     cmpq %r11, %r13          # Compare r11 with r13
     jb loop_zeros            # Loop if index < size
 
