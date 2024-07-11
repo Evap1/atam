@@ -3,14 +3,14 @@
 .section .text
 _start:
     movb $3, type            # Initialize type to 3
-    movq size, %r9           # Load size into r9
-    subq $1 , %r9
+    movq size, %r9           # Load size into r9 V
+    subq $1 , %r9 			 # V
     leaq data, %r10          # Load address of data into r10 (movq loads the first quad in 
-    movq size, %r13          # Load size into r13
+    movq size, %r13          # Load size into r13 V
     shrq $3, %r13            # Divide size by 8 (size/8)
     andq $7, %r9             # r9 = r9 & 7 (check if size is divisible by 8)
     testq %r9, %r9           # Update ZF based on r9
-    jne update_type1            # if not divisible jump to check simple condition
+    jne update_type1         # if not divisible jump to check simple condition
 
 loop_zeros:
     movq $0, %r11
@@ -29,7 +29,7 @@ update_type1:
     movb $1, type            # Initialize type to 1 for simple set check
 
     movb (%r10, %r9, 1), %al   # Load byte from data
-    cmpb $0, %al             # Check if null terminator
+    cmpb $0, %al               # Check if null terminator
     jne update_type4
     subq $1 , %r9
 
@@ -58,19 +58,19 @@ check_simple_char:
     je simple_char
 
     # Check if character is a digit (0-9)
-    cmpb $'0', %al
-    jg not_simple
+    cmpb $'0', %al     		# if ‘0’ > char then its not simple.
+    jb not_simple
     cmpb $'9', %al
-    jbe simple_char
+    jbe simple_char		# if ‘9’ > char then its simple. ( 0 < char < 9)
 
     # Check if character is a letter (A-Z or a-z)
-    cmpb $'A', %al
-    jg not_simple
-    cmpb $'Z', %al
+    cmpb $'A', %al			# if ‘A’ > char then its not simple.
+    jb not_simple
+    cmpb $'Z', %al			# if ‘Z’ > char then its simple. ( ‘A’ < char < ‘Z’)
     jbe simple_char
-    cmpb $'a', %al
+    cmpb $'a', %al			# if ‘a’ > char then its not simple.
     jg not_simple
-    cmpb $'z', %al
+    cmpb $'z', %al			# if ‘a’ > char then its simple. ( ‘a’ < char < ‘a’)
     jbe simple_char
 
 
@@ -97,9 +97,9 @@ check_science_char:
     movb (%r10, %r11, 1), %al   # Load byte from data
 
     cmpb $32, %al
-    jg not_science           # Check if character < 32
+    jb not_science           # if char < 32 it-s out of range
     cmpb $126, %al
-    jb not_science           # Check if character > 126
+    ja not_science           # if char > 126 it-s out of range
 
     incq %r11                # Increment index
     jmp check_science_char   # Loop if index < size
