@@ -97,9 +97,9 @@ check_science_char:
     movb (%r10, %r11, 1), %al   # Load byte from data
 
     cmpb $32, %al
-    jg not_science           # Check if character < 32
+    jb not_science           # Check if character < 32
     cmpb $126, %al
-    jb not_science           # Check if character > 126
+    jg not_science           # Check if character > 126
 
     incq %r11                # Increment index
     jmp check_science_char   # Loop if index < size
