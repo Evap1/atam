@@ -69,7 +69,7 @@ check_simple_char:
     cmpb $'Z', %al			# if ‘Z’ > char then its simple. ( ‘A’ < char < ‘Z’)
     jbe simple_char
     cmpb $'a', %al			# if ‘a’ > char then its not simple.
-    jg not_simple
+    jb not_simple
     cmpb $'z', %al			# if ‘a’ > char then its simple. ( ‘a’ < char < ‘a’)
     jbe simple_char
 
