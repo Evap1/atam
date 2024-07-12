@@ -9,7 +9,8 @@ check_nodes:
 
     movq nodes(, %r8, 8), %r10  # Load currentNode = nodes[i]
     
-    # Check if there are at least 3 elements from the left
+    # Initialize tendency
+    movq $0, %r11               # 0 = undecided, 1 = up, -1 = down
     movq 0(%r10), %r12          # Load prev pointer
     cmpq $0, %r12               # Check if prev is nullptr
     je right_check              # If so, skip left
@@ -19,30 +20,45 @@ check_nodes:
     je right_check              # If so, skip left
 
 inner_left_check:
+    movl 8(%r12), %eax          # Load prev->data
+    movl 8(%r13), %ebx          # Load prev of prev->data
+
+    # Determine tendency
+    cmp %eax, %ebx
+    jg set_down                 # If prev > prev of prev, set tendency to down
+    jl set_up                   # If prev < prev of prev, set tendency to up
+    jmp check_next_left         # If equal, check next left
+
+set_down:
+    movq $-1, %r11              # Set tendency to down
+    jmp check_next_left
+
+set_up:
+    movq $1, %r11               # Set tendency to up
+
+check_next_left:
     movq 0(%r13), %r14          # Load prev of prev of prev pointer
     cmpq $0, %r14               # Check if prev of prev of prev is nullptr
     je right_check              # If so, skip left
-  
-    movl 8(%r12), %eax          # Load prev->data
-    movl 8(%r13), %ebx          # Load prev of prev->data
+
     movl 8(%r14), %ecx          # Load prev of prev of prev->data
 
-    # Check for maxima or minima conditions
-    cmp %eax, %ebx              # Compare prev->data with prev of prev->data
-    jg check_left_ecx_ebx       # If prev > prev of prev, check if prev of prev > prev of prev of prev
-    je equal_label_left         # If equal, continue checking
+    # Check if the tendency is maintained
+    cmp %r11, $1                 # Check if tendency is up
+    je check_up
+    cmp %r11, $-1                # Check if tendency is down
+    je check_down
 
-check_left_ebx_ecx:
-    cmp %ebx, %ecx              # Compare prev of prev->data with prev of prev of prev->data
-    jg not_monotonic            # If prev of prev < prev of prev of prev, it's not monotonic
-    jle equal_label_left
+check_up:
+    cmp %ebx, %ecx               # Compare prev of prev with prev of prev of prev
+    jge not_monotonic            # If not maintaining tendency, it's not monotonic
+    jmp next_iteration_left
 
-check_left_ecx_ebx:
-    cmp %ebx, %ecx              # Compare prev of prev->data with prev of prev of prev->data
-    jl not_monotonic            # If prev of prev > prev of prev of prev, it's not monotonic
+check_down:
+    cmp %ebx, %ecx               # Compare prev of prev with prev of prev of prev
+    jle not_monotonic            # If not maintaining tendency, it's not monotonic
 
-    # Move to the next previous node for continued checking
-equal_label_left:
+next_iteration_left:
     movq %r13, %r12             # Move prev of prev to prev
     movq %r14, %r13             # Move prev of prev of prev to prev of prev
     jmp inner_left_check
@@ -64,24 +80,43 @@ inner_right_check:
 
     movl 8(%r12), %eax          # Load next->data
     movl 8(%r13), %ebx          # Load next of next->data
+
+    # Determine tendency
+    cmp %eax, %ebx
+    jg set_right_down           # If next > next of next, set tendency to down
+    jl set_right_up             # If next < next of next, set tendency to up
+    jmp check_next_right        # If equal, check next right
+
+set_right_down:
+    movq $-1, %r11              # Set tendency to down
+    jmp check_next_right
+
+set_right_up:
+    movq $1, %r11               # Set tendency to up
+
+check_next_right:
+    movq 12(%r13), %r14          # Load next of next of next pointer
+    cmpq $0, %r14               # Check if next of next of next is nullptr
+    je increment_result          # If so, increment result and skip checks
+
     movl 8(%r14), %ecx          # Load next of next of next->data
 
-  # Check for maxima or minima conditions
-    cmp %eax, %ebx              
-    jg check_right_ecx_ebx      
-    je equal_label_right        
+    # Check if the tendency is maintained
+    cmp %r11, $1                 # Check if tendency is up
+    je check_right_up
+    cmp %r11, $-1                # Check if tendency is down
+    je check_right_down
 
-check_right_ebx_ecx:
-    cmp %ebx, %ecx
-    jg not_monotonic
-    jle equal_label_right
+check_right_up:
+    cmp %ebx, %ecx               # Compare next of next with next of next of next
+    jge not_monotonic            # If not maintaining tendency, it's not monotonic
+    jmp next_iteration_right
 
-check_right_ecx_ebx:
-    cmp %ebx, %ecx
-    jl not_monotonic
+check_right_down:
+    cmp %ebx, %ecx               # Compare next of next with next of next of next
+    jle not_monotonic            # If not maintaining tendency, it's not monotonic
 
-    # Move to the next next node for continued checking
-equal_label_right:
+next_iteration_right:
     movq %r13, %r12             # Move next of next to next
     movq %r14, %r13             # Move next of next of next to next of next
     jmp inner_right_check
