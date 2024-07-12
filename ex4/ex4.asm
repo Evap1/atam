@@ -140,7 +140,7 @@ not_monotonic:
     jmp check_nodes              # Jump to next node out of the 3
 
 end_check:
-    movb %r9, result             # Store the value of %r9 into the address of the label 'result'
+    movq %r9, result             # Store the value of %r9 into the address of the label 'result'
 
     # Print "result="
     movq $1, %rax            # syscall number for sys_write
