@@ -1,6 +1,6 @@
 .global _start
 _start:
-   movq $0, %r9                  # Initialize result to 0
+  movq $0, %r9                  # Initialize result to 0
     movq $0, %r8                  # Initialize index i to 0
 
 check_next_node:
@@ -15,27 +15,29 @@ check_next_node:
     cmpq $0, %r12                 # Check if prev is nullptr
     je end_check_left             # If so, end check
 
+check_left_monotonic:
     movl 8(%r12), %eax            # Load previousValue
     movl 8(%r10), %ebx            # Load currentValue
 
-check_left_monotonic:
+    # Check if there's a next previous node
     movq 0(%r12), %r13            # Load next prev pointer
     cmpq $0, %r13                 # Check if next prev is nullptr
     je end_check_left             # If so, end check
 
     movl 8(%r13), %ecx            # Load nextValue
-    
-    # Check if the current value is a peak or trough
+
+    # Check for peak
     cmp %ebx, %eax                # Compare currentValue and previousValue
     jg check_trough               # If currentValue > previousValue, check trough
     jl check_peak                  # If currentValue < previousValue, check peak
 
 next_iteration:
-    movq %r12, %r13                # Move to the previous node
-    movq %r13, %r12                # Load new prev pointer
-    movl 8(%r12), %eax            # Load new previousValue
-    movl 8(%r10), %ebx            # Load new currentValue
-    jmp check_left_monotonic
+    movq %r12, %r13               # Move to the previous node
+    cmpq $0, %r13                 # Check if prev is nullptr
+    je end_check_left             # If so, end check
+
+    movq %r13, %r12               # Load new prev pointer
+    jmp check_left_monotonic      # Continue checking
 
 check_peak:
     cmp %eax, %ecx                # Compare previousValue and nextValue
@@ -49,7 +51,6 @@ check_trough:
 
 not_monotonic:
     movb $0, %al                  # Set hasMonotonicSeries to false
-    jmp end_check_left
 
 end_check_left:
     # Check if left is monotonic
