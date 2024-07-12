@@ -1,110 +1,107 @@
 .global _start
 _start:
-       # Initialize result to 0
-    movb $0, result
-
-    # Initialize loop counter to 0
-    movq $0, %rdi
+    movq $0, %r9                  # result = 0
+    movq $0, %r8                  # index i = 0
 
 check_next_node:
-    # Check if loop counter is 3
-    cmpq $3, %rdi
-    je end_loop
+    cmpq $3, %r8                  # if (i >= 3) break
+    jge end_check
 
-    # Load the current node address
-    movq nodes(, %rdi, 8), %r8  # %r8 = nodes[rdi]
+    movq nodes(%rip, %r8, 8), %r10  # currentNode = nodes[i]
 
-    # Initialize left and right monotonicity flags
-    movb $1, %r9b  # leftNonIncreasing
-    movb $1, %r10b # leftNonDecreasing
-    movb $1, %r11b # rightNonIncreasing
-    movb $1, %r12b # rightNonDecreasing
+    # Check left monotonicity
+    movq %r10, %r11               # current = currentNode->prev
+    movq -8(%r11), %r11
+    movb $1, %r12                 # leftMonotonic = true
 
-    # Save the current node pointer
-    movq %r8, %r13
+check_left_monotonic:
+    cmpq $0, %r11                 # if (current == nullptr) break
+    je end_check_left
 
-    # Check left side
-    movq (%r8), %r8 # %r8 = current->prev
-check_left:
-    testq %r8, %r8
-    jz check_right   # If %r8 == NULL, jump to check_right
+    movq -8(%r11), %r13           # previous = current->prev
+    cmpq $0, %r13                 # if (previous == nullptr) break
+    je end_check_left
 
-    movq (%r8), %r14 # %r14 = leftPtr->prev
-    testq %r14, %r14
-    jz check_right   # If %r14 == NULL, jump to check_right
+    movl 8(%r10), %eax            # currentNode->data
+    movl 8(%r11), %ebx            # current->data
+    movl 8(%r13), %ecx            # previous->data
 
-    movl 8(%r8), %r15d  # %r15d = leftPtr->data
-    movl 8(%r14), %edx  # %edx = leftPrev->data
+    # Compare data values
+    cmpl %ebx, %eax               # if (currentNode->data < current->data)
+    jg left_monotonic_dec
 
-    cmpq %r15, %rdx
-    jl not_left_non_increasing
-    cmpq %r15, %rdx
-    jg not_left_non_decreasing
+    cmpl %ecx, %ebx               # if (current->data > previous->data) leftMonotonic = false
+    jg not_left_monotonic
 
-    movq %r14, %r8  # leftPtr = leftPrev
-    jmp check_left
+    jmp left_monotonic_continue
 
-not_left_non_increasing:
-    movb $0, %r9b
-    jmp check_left
+left_monotonic_dec:
+    cmpl %ecx, %ebx               # if (current->data < previous->data) leftMonotonic = false
+    jl not_left_monotonic
 
-not_left_non_decreasing:
-    movb $0, %r10b
-    jmp check_left
+left_monotonic_continue:
+    movq %r13, %r11               # current = previous
+    jmp check_left_monotonic
 
-check_right:
-    # Restore the current node pointer
-    movq %r13, %r8
+not_left_monotonic:
+    movb $0, %r12                 # leftMonotonic = false
 
-    # Check right side
-    movq 16(%r8), %r8 # %r8 = current->next
-check_right_inner:
-    testq %r8, %r8
-    jz finalize_check   # If %r8 == NULL, jump to finalize_check
+end_check_left:
 
-    movq 16(%r8), %r14 # %r14 = rightPtr->next
-    testq %r14, %r14
-    jz finalize_check   # If %r14 == NULL, jump to finalize_check
+    # Check right monotonicity
+    movq 8(%r10), %r11            # current = currentNode->next
+    movb $1, %r13                 # rightMonotonic = true
 
-    movl 8(%r8), %r15d  # %r15d = rightPtr->data
-    movl 8(%r14), %edx  # %edx = rightNext->data
+check_right_monotonic:
+    cmpq $0, %r11                 # if (current == nullptr) break
+    je end_check_right
 
-    cmpq %r15, %rdx
-    jl not_right_non_increasing
-    cmpq %r15, %rdx
-    jg not_right_non_decreasing
+    movq 8(%r11), %r14            # next = current->next
+    cmpq $0, %r14                 # if (next == nullptr) break
+    je end_check_right
 
-    movq %r14, %r8  # rightPtr = rightNext
-    jmp check_right_inner
+    movl 8(%r10), %eax            # currentNode->data
+    movl 8(%r11), %ebx            # current->data
+    movl 8(%r14), %ecx            # next->data
 
-not_right_non_increasing:
-    movb $0, %r11b
-    jmp check_right_inner
+    # Compare data values
+    cmpl %ebx, %eax               # if (currentNode->data < current->data)
+    jg right_monotonic_dec
 
-not_right_non_decreasing:
-    movb $0, %r12b
-    jmp check_right_inner
+    cmpl %ecx, %ebx               # if (current->data > next->data) rightMonotonic = false
+    jg not_right_monotonic
 
-finalize_check:
-    # Check if both conditions are met
-    testb %r9b, %r9b
-    jz next_node
-    testb %r10b, %r10b
-    jz next_node
-    testb %r11b, %r11b
-    jz next_node
-    testb %r12b, %r12b
+    jmp right_monotonic_continue
+
+right_monotonic_dec:
+    cmpl %ecx, %ebx               # if (current->data < next->data) rightMonotonic = false
+    jl not_right_monotonic
+
+right_monotonic_continue:
+    movq %r14, %r11               # current = next
+    jmp check_right_monotonic
+
+not_right_monotonic:
+    movb $0, %r13                 # rightMonotonic = false
+
+end_check_right:
+
+    # Check if both left and right are monotonic
+    testb %r12, %r12              # if (leftMonotonic)
     jz next_node
 
-    # If both conditions are met, increment result
-    incb result
+    testb %r13, %r13              # if (rightMonotonic)
+    jz next_node
+
+    incq %r9                      # result++
 
 next_node:
-    # Increment loop counter and proceed to next node
-    incq %rdi
+    incq %r8                      # i++
     jmp check_next_node
 
-end_loop:
+end_check:
+    movq %r9, result(%rip)        # result = r9
+
 
 
 # Print "result="
