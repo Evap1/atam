@@ -1,29 +1,4 @@
 .global _start
-
-_start:
-.section .data
-nodes:
-    .quad Node2
-    .quad Node1
-    .quad Node3
-result:
-    .byte 0
-
-Node1: 
-    .quad 0
-    .int 1
-    .quad Node2
-Node2: 
-    .quad Node1
-    .int 4
-    .quad Node3
-Node3: 
-    .quad Node2
-    .int 7
-    .quad 0
-
-.section .text
-.global _start
 _start:
     # Initialize result to 0
     movb $0, result
