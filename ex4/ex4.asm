@@ -1,6 +1,6 @@
 .global _start
 _start:
-    movq $0, %r9                  # Initialize result to 0
+   movq $0, %r9                  # Initialize result to 0
     movq $0, %r8                  # Initialize index i to 0
 
 check_next_node:
@@ -17,7 +17,7 @@ check_left_monotonic:
     cmpq $0, %r11                 # Check if current is nullptr
     je end_check_left
 
-    movq -8(%r11), %r12           # Get previous node
+    movq -16(%r11), %r12          # Get previous node (8 bytes for prev pointer)
     cmpq $0, %r12                 # Check if previous is nullptr
     je end_check_left
 
@@ -48,14 +48,14 @@ not_left_monotonic:
 end_check_left:
 
     # Check right monotonicity
-    movq 8(%r10), %r11            # current = currentNode->next
+    movq 16(%r10), %r11           # current = currentNode->next
     movb $1, %ah                  # Set rightMonotonic to true
 
 check_right_monotonic:
     cmpq $0, %r11                 # Check if current is nullptr
     je end_check_right
 
-    movq 8(%r11), %r12            # Get next node
+    movq 16(%r11), %r12           # Get next node (8 bytes for next pointer)
     cmpq $0, %r12                 # Check if next is nullptr
     je end_check_right
 
