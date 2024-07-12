@@ -14,44 +14,43 @@ check_nodes:
 
     # Initialize tendency
     movq $0, %r11               # 0 = undecided, 1 = up, -1 = down
+
+    # Left check
     movq 0(%r10), %r12          # Load prev pointer
     cmpq $0, %r12               # Check if prev is nullptr
     je right_check              # If so, skip left
 
+find_tendency_left:
+    movl 8(%r12), %eax          # Load prev->data
     movq 0(%r12), %r13          # Load prev of prev pointer
     cmpq $0, %r13               # Check if prev of prev is nullptr
     je right_check              # If so, skip left
 
-inner_left_check:
-    movl 8(%r12), %eax          # Load prev->data
     movl 8(%r13), %ebx          # Load prev of prev->data
+    cmp %eax, %ebx
+    je equal_left
 
-    # Determine tendency if not yet set
-    cmpq $0, %r11
-    jne check_tendency_left     # If tendency is set, check the tendency
+    # Determine tendency
     cmp %eax, %ebx
     jg set_left_down            # If prev > prev of prev, set tendency to down
     jl set_left_up              # If prev < prev of prev, set tendency to up
 
-    # If equal, move to the next pair
+equal_left:
     movq %r13, %r12             # Move prev of prev to prev
-    movq 0(%r13), %r13          # Load prev of prev of prev pointer
-    cmpq $0, %r13               # Check if prev of prev of prev is nullptr
-    je right_check              # If so, skip left
-    jmp inner_left_check        # Continue checking
+    jmp find_tendency_left      # Continue checking
 
 set_left_down:
     movq $-1, %r11              # Set tendency to down
-    jmp check_tendency_left
+    jmp check_left_tendency
 
 set_left_up:
     movq $1, %r11               # Set tendency to up
 
-check_tendency_left:
-    cmpq $0, %r13               # Check if prev of prev of prev is nullptr
+check_left_tendency:
+    cmpq $0, %r12               # Check if prev is nullptr
     je right_check              # If so, skip left
-    movl 8(%r13), %ecx          # Load prev of prev of prev->data
 
+    movl 8(%r12), %ecx          # Load prev->data
     cmpq $1, %r11
     jl check_left_down          # If tendency is down, check that the values are decreasing
 
@@ -65,56 +64,49 @@ check_left_down:
     jle not_monotonic
 
 continue_check_left:
-    movq %r13, %r12             # Move prev of prev to prev
-    movq 0(%r13), %r13          # Load prev of prev of prev pointer
-    jmp inner_left_check
+    movq 0(%r12), %r12          # Load prev pointer
+    jmp check_left_tendency
 
 right_check:
-    # Check if there are at least 3 elements to the right
-    movq 12(%r10), %r12          # Load next pointer
+    # Initialize tendency
+    movq $0, %r11               # 0 = undecided, 1 = up, -1 = down
+    movq 12(%r10), %r12         # Load next pointer
     cmpq $0, %r12               # Check if next is nullptr
-    je increment_result          # If so, increment result and skip checks
+    je increment_result         # If so, increment result and skip right
 
-    movq 12(%r12), %r13          # Load next of next pointer
-    cmpq $0, %r13               # Check if next of next is nullptr
-    je increment_result          # If so, increment result and skip checks
-
-inner_right_check:
-    movq 12(%r13), %r14          # Load next of next of next pointer
-    cmpq $0, %r14               # Check if next of next of next is nullptr
-    je increment_result          # If so, increment result and skip checks
-
+find_tendency_right:
     movl 8(%r12), %eax          # Load next->data
+    movq 12(%r12), %r13         # Load next of next pointer
+    cmpq $0, %r13               # Check if next of next is nullptr
+    je increment_result         # If so, increment result and skip right
+
     movl 8(%r13), %ebx          # Load next of next->data
-
-    # Determine tendency if not yet set
-    cmpq $0, %r11
-    jne check_tendency_right    # If tendency is set, check the tendency
     cmp %eax, %ebx
-    jg set_right_down            # If next > next of next, set tendency to down
-    jl set_right_up              # If next < next of next, set tendency to up
+    je equal_right
 
-    # If equal, move to the next pair
+    # Determine tendency
+    cmp %eax, %ebx
+    jg set_right_down           # If next > next of next, set tendency to down
+    jl set_right_up             # If next < next of next, set tendency to up
+
+equal_right:
     movq %r13, %r12             # Move next of next to next
-    movq 12(%r13), %r13         # Load next of next of next pointer
-    cmpq $0, %r13               # Check if next of next of next is nullptr
-    je increment_result          # If so, increment result and skip checks
-    jmp inner_right_check        # Continue checking
+    jmp find_tendency_right     # Continue checking
 
 set_right_down:
-    movq $-1, %r11               # Set tendency to down
-    jmp check_tendency_right
+    movq $-1, %r11              # Set tendency to down
+    jmp check_right_tendency
 
 set_right_up:
-    movq $1, %r11                # Set tendency to up
+    movq $1, %r11               # Set tendency to up
 
-check_tendency_right:
-    cmpq $0, %r14               # Check if next of next of next is nullptr
-    je increment_result          # If so, increment result and skip checks
-    movl 8(%r14), %ecx          # Load next of next of next->data
+check_right_tendency:
+    cmpq $0, %r12               # Check if next is nullptr
+    je increment_result         # If so, skip right
 
+    movl 8(%r12), %ecx          # Load next->data
     cmpq $1, %r11
-    jl check_right_down          # If tendency is down, check that the values are decreasing
+    jl check_right_down         # If tendency is down, check that the values are decreasing
 
 check_right_up:
     cmp %ebx, %ecx
@@ -126,21 +118,22 @@ check_right_down:
     jle not_monotonic
 
 continue_check_right:
-    movq %r13, %r12             # Move next of next to next
-    movq 12(%r13), %r13         # Load next of next of next pointer
-    jmp inner_right_check
+    movq 12(%r12), %r12         # Load next pointer
+    jmp check_right_tendency
 
 increment_result:
-    incq %r9                     # Increment result if monotonic
-    incq %r8                     # Increment index i
-    jmp check_nodes              # Repeat the loop
+    incq %r9                    # Increment result if monotonic
+    jmp increment_index         # Move to next node
 
 not_monotonic:
-    incq %r8                     # Increment index i
-    jmp check_nodes              # Jump to next node out of the 3
+    jmp increment_index         # Move to the next node
+
+increment_index:
+    incq %r8                    # Increment index i
+    jmp check_nodes             # Repeat the loop
 
 end_check:
-    movq %r9, result             # Store the value of %r9 into the address of the label 'result'
+    movq %r9, result            # Store the value of %r9 into the address of the label 'result'
 
     # Print "result="
     movq $1, %rax            # syscall number for sys_write
