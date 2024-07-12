@@ -1,0 +1,5 @@
+as -g ex3.asm ex3_test1 -o ex3_test1.o && ld -g ex3_test1.o -o ex3_test1_run && ./ex3_test1_run
+as -g ex3.asm ex3_test2 -o ex3_test2.o && ld -g ex3_test2.o -o ex3_test2_run && ./ex3_test2_run
+as -g ex3.asm ex3_test3 -o ex3_test3.o && ld -g ex3_test3.o -o ex3_test3_run && ./ex3_test3_run
+as -g ex3.asm ex3_test4 -o ex3_test4.o && ld -g ex3_test4.o -o ex3_test4_run && ./ex3_test4_run
+as -g ex3.asm ex3_test5 -o ex3_test5.o && ld -g ex3_test5.o -o ex3_test5_run && ./ex3_test5_run
