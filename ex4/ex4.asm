@@ -1,65 +1,52 @@
 .global _start
 _start:
-   movq $0, %r9                  # Initialize result to 0
-    movq $0, %r8                  # Initialize index i to 0
+  movq nodes, %r8             # Load address of nodes array
+    xorq %r9, %r9               # Initialize sum to 0
+    movq $3, %r10                # Set loop counter for 3 nodes
 
-check_next_node:
-    cmpq $3, %r8                  # Check if i >= 3
-    jge end_check                 # If so, exit loop
+loop_nodes:
+    dec %r10                     # Decrement node index
+    jl end                       # Exit if index < 0
 
-    movq nodes(, %r8, 8), %r10    # Load currentNode = nodes[i]
-    movq %r10, %r11               # current = currentNode
+    movq (%r8, %r10, 8), %r11    # Load current node address
+    movq 0(%r11), %r12           # Load prev pointer
+    movl 8(%r11), %eax           # Load currentNode->data
+    movq 16(%r11), %r13          # Load next pointer
+    cmpq $0, %r12                # Check if prev is null
+    je check_right               # If so, skip left check
 
-    # Check left monotonicity
-    movb $1, %al                  # Set leftMonotonic to true
-check_left_monotonic:
-    movq 0(%r11), %r12            # Load prev pointer
-    cmpq $0, %r12                 # Check if prev is nullptr
-    je check_right_monotonic      # If so, check right
+check_left:
+    # Check for monotonicity from left to current node
+    cmpq $0, %r12                # Check if there is a previous node
+    je check_right               # If no prev, skip left check
 
-    # Load data from currentNode and prev
-    movl 8(%r11), %eax            # Load currentNode->data
-    movl 8(%r12), %ebx            # Load prev->data
-    cmpl %ebx, %eax               # Compare currentNode->data and prev->data
-    jl not_left_monotonic         # If currentNode->data < prev->data, not monotonic
-    movq %r12, %r11               # Move to the previous node
-    jmp check_left_monotonic
+    movq %r12, %r12              # Load prev pointer into r12 for next check
+    movl 8(%r12), %ebx           # Load prev node data
+    cmp %ebx, %eax               # Compare with current node data
+    jg not_monotonic             # If prev > current, not monotonic
+    # If not less, continue checking
 
-not_left_monotonic:
-    movb $0, %al                  # Set leftMonotonic to false
+    jmp check_left               # Repeat for all previous nodes
 
-check_right_monotonic:
-    movq 16(%r10), %r12           # Load next pointer
-    cmpq $0, %r12                 # Check if next is nullptr
-    je end_check_left_right       # If so, end check
+check_right:
+    cmpq $0, %r13                # Check if next is null
+    je not_monotonic             # If so, skip right check
 
-    # Load data from currentNode and next
-    movl 8(%r10), %eax            # Load currentNode->data
-    movl 8(%r12), %ebx            # Load next->data
-    cmpl %ebx, %eax               # Compare currentNode->data and next->data
-    jg not_right_monotonic        # If currentNode->data > next->data, not monotonic
+    # Load next node data
+    movl 8(%r13), %ecx           # Load next node data
+    cmp %ecx, %eax               # Compare with current node data
+    jl not_monotonic             # If next < current, not monotonic
 
-    # Continue checking right monotonicity
-    movq %r12, %r10               # Move to the next node
-    jmp check_right_monotonic
+    # If both checks are good, increment sum
+    incq %r9
+    jmp loop_nodes               # Repeat for the next node
 
-not_right_monotonic:
-    movb $0, %bl                  # Set rightMonotonic to false
+not_monotonic:
+    jmp loop_nodes               # Go to the next node
 
-end_check_left_right:
-    testb %al, %al                # If leftMonotonic
-    testb %bl, %bl                # If rightMonotonic
-    jz next_node                  # If either is not monotonic, skip
-
-    incq %r9                      # Increment result if both are monotonic
-
-next_node:
-    incq %r8                      # Increment i
-    jmp check_next_node
-
-end_check:
-    movq %r9, result(%rip)        # Store result
-
+end:
+    # Store result in 'result'
+    movq %r9, result             # Move the count of monotonic nodes to result
 
 # Print "result="
     movq $1, %rax            # syscall number for sys_write
