@@ -36,6 +36,7 @@ inner_left_check:
 check_ebx_ecx:
     cmp %ebx, %ecx              # Compare prev of prev->data with prev of prev of prev->data
     jl not_monotonic            # If prev of prev < prev of prev of prev, it's not monotonic
+    jge equal_label_left
 
 check_ecx_ebx:
     cmp %ebx, %ecx              # Compare prev of prev->data with prev of prev of prev->data
@@ -75,6 +76,7 @@ inner_right_check:
 check_ebx_ecx_right:
     cmp %ebx, %ecx              # Compare next of next->data with next of next of next->data
     jl not_monotonic            # If next of next < next of next of next, it's not monotonic
+    jge equal_label_right
 
 check_ecx_right:
     cmp %eax, %ecx              # Compare next->data with next of next of next->data
