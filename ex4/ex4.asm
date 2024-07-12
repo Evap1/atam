@@ -1,13 +1,13 @@
 .global _start
 _start:
-   movq $0, %r9                  # Initialize result to 0
+    movq $0, %r9                  # Initialize result to 0
     movq $0, %r8                  # Initialize index i to 0
 
 check_next_node:
     cmpq $3, %r8                  # Check if i >= 3
     jge end_check                 # If so, exit loop
 
-    movq nodes(%rip, %r8, 8), %r10  # Load currentNode = nodes[i]
+    movq nodes(, %r8, 8), %r10    # Load currentNode = nodes[i]
 
     # Check left monotonicity
     movq %r10, %r11               # current = currentNode->prev
@@ -100,8 +100,6 @@ next_node:
 
 end_check:
     movq %r9, result(%rip)        # Store result
-
-
 
 # Print "result="
     movq $1, %rax            # syscall number for sys_write
