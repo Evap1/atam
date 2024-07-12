@@ -1,6 +1,6 @@
 .global _start
 _start:
-    # Initialize result to 0
+       # Initialize result to 0
     movb $0, result
 
     # Initialize loop counter to 0
