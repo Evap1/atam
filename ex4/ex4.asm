@@ -1,6 +1,6 @@
 .global _start
 _start:
-     movq $0, %r9                  # Initialize result to 0
+  movq $0, %r9                  # Initialize result to 0
     movq $0, %r8                  # Initialize index i to 0
 
 check_next_node:
@@ -18,6 +18,7 @@ check_left_monotonic:
     cmpq $0, %r12                 # Check if prev is nullptr
     je end_check_left
 
+    # Load data from currentNode and prev
     movl 8(%r11), %eax            # Load currentNode->data
     movl 8(%r12), %ebx            # Load prev->data
 
@@ -41,6 +42,7 @@ check_right_monotonic:
     cmpq $0, %r11                 # Check if next is nullptr
     je end_check_right
 
+    # Load data from currentNode and next
     movl 8(%r10), %eax            # Load currentNode->data
     movl 8(%r11), %ebx            # Load next->data
 
@@ -71,7 +73,6 @@ next_node:
 
 end_check:
     movq %r9, result(%rip)        # Store result
-
 
 # Print "result="
     movq $1, %rax            # syscall number for sys_write
