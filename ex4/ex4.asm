@@ -1,6 +1,6 @@
 .global _start
 _start:
-  movq $0, %r9                  # Initialize result to 0
+    movq $0, %r9                  # Initialize result to 0
     movq $0, %r8                  # Initialize index i to 0
 
 check_next_node:
@@ -50,6 +50,7 @@ check_right_monotonic:
     cmpl %ebx, %eax               # Compare currentNode->data and next->data
     jg not_right_monotonic        # If currentNode->data > next->data, not monotonic
 
+    # Move to the next node and repeat
     movq 16(%r11), %r11           # Move to the next node
     jmp check_right_monotonic
 
