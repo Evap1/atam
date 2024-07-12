@@ -1,8 +1,7 @@
 .global _start
 
 _start:
-
-# Initialize result to 0
+ # Initialize result to 0
     movb $0, result
 
     # Initialize loop counter to 0
@@ -36,11 +35,11 @@ check_left:
     jz check_right   # If %r14 == NULL, jump to check_right
 
     movl 8(%r8), %r15d  # %r15d = leftPtr->data
-    movl 8(%r14), %r16d # %r16d = leftPrev->data
+    movl 8(%r14), %rsi  # %rsi = leftPrev->data
 
-    cmpq %r15, %r16
+    cmpq %r15, %rsi
     jl not_left_non_increasing
-    cmpq %r15, %r16
+    cmpq %r15, %rsi
     jg not_left_non_decreasing
 
     movq %r14, %r8  # leftPtr = leftPrev
@@ -69,11 +68,11 @@ check_right_inner:
     jz finalize_check   # If %r14 == NULL, jump to finalize_check
 
     movl 8(%r8), %r15d  # %r15d = rightPtr->data
-    movl 8(%r14), %r16d # %r16d = rightNext->data
+    movl 8(%r14), %rsi  # %rsi = rightNext->data
 
-    cmpq %r15, %r16
+    cmpq %r15, %rsi
     jl not_right_non_increasing
-    cmpq %r15, %r16
+    cmpq %r15, %rsi
     jg not_right_non_decreasing
 
     movq %r14, %r8  # rightPtr = rightNext
