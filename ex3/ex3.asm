@@ -4,7 +4,7 @@
 _start:
 	movq $0, %r8 		# vertex_counter = 0
 	movq $0, %r9 		# leaf_counter = 0
-	movq .root, %r10 	# node_level1 = root_array[0]
+	movq root, %r10 	# node_level1 = root_array[0]
 
 
     	# start traversal from root
@@ -29,12 +29,12 @@ level4:
 level5:
     	cmpq $0, %r15              
     	je level5_end
-    	movq (%r15), %r16           
+    	movq (%r15), %rax           
 level6:
-    	cmpq $0, %r16               
+    	cmpq $0, %rax               
     	je level6_end
     	incq %r8                    # increment v_counter for level 6 node
-    	addq $8, %r16               # move to the next son in level 6 array
+    	addq $8, %rax               # move to the next son in level 6 array
     	jmp level6
 level6_end:
     	cmpq $0, %r15
@@ -149,7 +149,6 @@ rich_buf:
 
 
 # IMPORTANT: the max depth of the tree is 6 including the root.
-‪#‬# בעץ שתקבלו בשאלה 3 יהיה שורש תקין, כלומר לפחות צומת אחד‪#‬
 
 # pseudo
 #v_counter = 0
