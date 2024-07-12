@@ -45,26 +45,29 @@ set_left_down:
 
 set_left_up:
     movq $1, %r11               # Set tendency to up
+    jmp check_left_tendency
 
 check_left_tendency:
-    cmpq $0, %r12               # Check if prev is nullptr
+    movq 0(%r12), %r13          # Load prev of prev pointer
+    cmpq $0, %r13               # Check if prev of prev is nullptr
     je right_check              # If so, skip left
 
-    movl 8(%r12), %ecx          # Load prev->data
+    movl 8(%r12), %eax          # Load prev->data
+    movl 8(%r13), %ebx          # Load prev of prev->data
     cmpq $1, %r11
     jl check_left_down          # If tendency is down, check that the values are decreasing
 
 check_left_up:
-    cmp %ebx, %ecx
+    cmp %eax, %ebx
     jge not_monotonic
     jmp continue_check_left
 
 check_left_down:
-    cmp %ebx, %ecx
+    cmp %eax, %ebx
     jle not_monotonic
 
 continue_check_left:
-    movq 0(%r12), %r12          # Load prev pointer
+    movq %r13, %r12             # Move prev of prev to prev
     jmp check_left_tendency
 
 right_check:
@@ -99,26 +102,29 @@ set_right_down:
 
 set_right_up:
     movq $1, %r11               # Set tendency to up
+    jmp check_right_tendency
 
 check_right_tendency:
-    cmpq $0, %r12               # Check if next is nullptr
+    movq 12(%r12), %r13         # Load next of next pointer
+    cmpq $0, %r13               # Check if next of next is nullptr
     je increment_result         # If so, skip right
 
-    movl 8(%r12), %ecx          # Load next->data
+    movl 8(%r12), %eax          # Load next->data
+    movl 8(%r13), %ebx          # Load next of next->data
     cmpq $1, %r11
     jl check_right_down         # If tendency is down, check that the values are decreasing
 
 check_right_up:
-    cmp %ebx, %ecx
+    cmp %eax, %ebx
     jge not_monotonic
     jmp continue_check_right
 
 check_right_down:
-    cmp %ebx, %ecx
+    cmp %eax, %ebx
     jle not_monotonic
 
 continue_check_right:
-    movq 12(%r12), %r12         # Load next pointer
+    movq %r13, %r12             # Move next of next to next
     jmp check_right_tendency
 
 increment_result:
