@@ -41,15 +41,15 @@ level4:
 level5:
     cmpq $0, %r15              
     je level5_end
-    movq (%r15), %r16          
-    cmpq $0, %r16            
+    movq (%r15), %rax          
+    cmpq $0, %rax            
     je level5_leaf
 
 level6:
-    cmpq $0, %r16            
+    cmpq $0, %rax            
     je level6_end
     incq %r8                   
-    addq $8, %r16             
+    addq $8, %rax             
     jmp level6
 level6_end:
     cmpq $0, %r15
