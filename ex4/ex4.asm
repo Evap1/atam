@@ -1,7 +1,9 @@
 .global _start
+
 _start:
-    # Initialize result to 0
-    movq $0, result
+
+# Initialize result to 0
+    movb $0, result
 
     # Initialize loop counter to 0
     movq $0, %rdi
@@ -20,25 +22,28 @@ check_next_node:
     movb $1, %r11b # rightNonIncreasing
     movb $1, %r12b # rightNonDecreasing
 
+    # Save the current node pointer
+    movq %r8, %r13
+
     # Check left side
     movq (%r8), %r8 # %r8 = current->prev
 check_left:
     testq %r8, %r8
     jz check_right   # If %r8 == NULL, jump to check_right
 
-    movq (%r8), %r13 # %r13 = leftPtr->prev
-    testq %r13, %r13
-    jz check_right   # If %r13 == NULL, jump to check_right
+    movq (%r8), %r14 # %r14 = leftPtr->prev
+    testq %r14, %r14
+    jz check_right   # If %r14 == NULL, jump to check_right
 
-    movl 8(%r8), %r14d  # %r14d = leftPtr->data
-    movl 8(%r13), %r15d # %r15d = leftPrev->data
+    movl 8(%r8), %r15d  # %r15d = leftPtr->data
+    movl 8(%r14), %r16d # %r16d = leftPrev->data
 
-    cmpq %r14, %r15
+    cmpq %r15, %r16
     jl not_left_non_increasing
-    cmpq %r14, %r15
+    cmpq %r15, %r16
     jg not_left_non_decreasing
 
-    movq %r13, %r8  # leftPtr = leftPrev
+    movq %r14, %r8  # leftPtr = leftPrev
     jmp check_left
 
 not_left_non_increasing:
@@ -50,25 +55,28 @@ not_left_non_decreasing:
     jmp check_left
 
 check_right:
+    # Restore the current node pointer
+    movq %r13, %r8
+
     # Check right side
     movq 16(%r8), %r8 # %r8 = current->next
 check_right_inner:
     testq %r8, %r8
     jz finalize_check   # If %r8 == NULL, jump to finalize_check
 
-    movq 16(%r8), %r13 # %r13 = rightPtr->next
-    testq %r13, %r13
-    jz finalize_check   # If %r13 == NULL, jump to finalize_check
+    movq 16(%r8), %r14 # %r14 = rightPtr->next
+    testq %r14, %r14
+    jz finalize_check   # If %r14 == NULL, jump to finalize_check
 
-    movl 8(%r8), %r14d  # %r14d = rightPtr->data
-    movl 8(%r13), %r15d # %r15d = rightNext->data
+    movl 8(%r8), %r15d  # %r15d = rightPtr->data
+    movl 8(%r14), %r16d # %r16d = rightNext->data
 
-    cmpq %r14, %r15
+    cmpq %r15, %r16
     jl not_right_non_increasing
-    cmpq %r14, %r15
+    cmpq %r15, %r16
     jg not_right_non_decreasing
 
-    movq %r13, %r8  # rightPtr = rightNext
+    movq %r14, %r8  # rightPtr = rightNext
     jmp check_right_inner
 
 not_right_non_increasing:
@@ -91,8 +99,7 @@ finalize_check:
     jz next_node
 
     # If both conditions are met, increment result
-    movq result, %r8
-    incq (%r8)
+    incb result
 
 next_node:
     # Increment loop counter and proceed to next node
