@@ -1,6 +1,6 @@
 .global _start
 _start:
-    movq $0, result               # Initialize result to 0
+    movq $0, %r9               # Initialize result to 0
     movq $0, %r8                  # Initialize index i to 0
 
 check_nodes:
