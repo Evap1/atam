@@ -127,7 +127,7 @@ end_check:
     cmpq %r8, %r9               # compare (leaf_counter * 3) with (v_counter - leaf_counter)
     jg not_rich
     movb $1, rich               # set rich to 1 if the condition is met
-    jmp end_program
+    jmp end
 not_rich:
     movb $0, rich               # set rich to 0 if the condition is not met
 
