@@ -2,94 +2,135 @@
 
 .section .text
 _start:
-	movq $0, %r8 		# vertex_counter = 0
-	movq $0, %r9 		# leaf_counter = 0
-	movq root, %r10 	# node_level1 = root_array[0]
+    movq $0, %r8 		# vertex_counter = 0
+    movq $0, %r9 		# leaf_counter = 0
+    movq root, %r10 	# node_level1 = root_array[0]
 
 
-    	# start traversal from root
-	movq (%r10), %r11           # load the first son of the root
+    # start traversal from root
+    movq (%r10), %r11           # load the first son of the root
 
 level1:
-    	cmpq $0, %r11               # if current son is 0, break level 1 loop
-    	je level1_end
-    	movq (%r11), %r12           # load the first son of level 1 node
+    cmpq $0, %r11               # if current son is 0, break level 1 loop
+    je level1_end
+    movq (%r11), %r12           # load the first son of level 1 node
+    cmpq $0, %r12               # check if level 1 node is a leaf
+    je level1_leaf
+
 level2:
-    	cmpq $0, %r12               
-    	je level2_end
-    	movq (%r12), %r13           
+    cmpq $0, %r12               
+    je level2_end
+    movq (%r12), %r13          
+    cmpq $0, %r13              
+    je level2_leaf
+
 level3:
-    	cmpq $0, %r13               
-    	je level3_end
-    	movq (%r13), %r14           
+    cmpq $0, %r13             
+    je level3_end
+    movq (%r13), %r14   
+    cmpq $0, %r14        
+    je level3_leaf
+
 level4:
-    	cmpq $0, %r14               
-    	je level4_end
-    	movq (%r14), %r15           
+    cmpq $0, %r14        
+    je level4_end
+    movq (%r14), %r15       
+    cmpq $0, %r15           
+    je level4_leaf
+
 level5:
-    	cmpq $0, %r15              
-    	je level5_end
-    	movq (%r15), %rax           
+    cmpq $0, %r15              
+    je level5_end
+    movq (%r15), %r16          
+    cmpq $0, %r16            
+    je level5_leaf
+
 level6:
-    	cmpq $0, %rax               
-    	je level6_end
-    	incq %r8                    # increment v_counter for level 6 node
-    	addq $8, %rax               # move to the next son in level 6 array
-    	jmp level6
+    cmpq $0, %r16            
+    je level6_end
+    incq %r8                   
+    addq $8, %r16             
+    jmp level6
 level6_end:
-    	cmpq $0, %r15
-    	jne not_leaf5
-    	incq %r9                    # increment leaf_counter if level 5 node is a leaf
+    cmpq $0, %r15
+    jne not_leaf5
+    incq %r9                    # increment leaf_counter if level 5 node is a leaf
+    jmp level5_continue
+level5_leaf:
+    incq %r9                    # increment leaf_counter if level 5 node is a leaf
+    jmp level5_continue
 not_leaf5:
-    	incq %r8                    # increment v_counter for level 5 node
-    	addq $8, %r15               # move to the next son in level 5 array
-    	jmp level5
+    incq %r8                    # increment v_counter for level 5 node
+level5_continue:
+    addq $8, %r15               # move to the next son in level 5 array
+    jmp level5
 level5_end:
-    	cmpq $0, %r14
-    	jne not_leaf4
-    	incq %r9                    # increment leaf_counter if level 4 node is a leaf
+    cmpq $0, %r14
+    jne not_leaf4
+    incq %r9                    # increment leaf_counter if level 4 node is a leaf
+    jmp level4_continue
+level4_leaf:
+    incq %r9                    # increment leaf_counter if level 4 node is a leaf
+    jmp level4_continue
 not_leaf4:
-    	incq %r8                    # increment v_counter for level 4 node
-    	addq $8, %r14               # move to the next son in level 4 array
-    	jmp level4
+    incq %r8                    # increment v_counter for level 4 node
+level4_continue:
+    addq $8, %r14               # move to the next son in level 4 array
+    jmp level4
 level4_end:
-    	cmpq $0, %r13
-    	jne not_leaf3
-    	incq %r9                    # increment leaf_counter if level 3 node is a leaf
+    cmpq $0, %r13
+    jne not_leaf3
+    incq %r9                    # increment leaf_counter if level 3 node is a leaf
+    jmp level3_continue
+level3_leaf:
+    incq %r9                    # increment leaf_counter if level 3 node is a leaf
+    jmp level3_continue
 not_leaf3:
-    	incq %r8                    # increment v_counter for level 3 node
-    	addq $8, %r13               # move to the next son in level 3 array
-    	jmp level3
+    incq %r8                    # increment v_counter for level 3 node
+level3_continue:
+    addq $8, %r13               # move to the next son in level 3 array
+    jmp level3
 level3_end:
-    	cmpq $0, %r12
-    	jne not_leaf2
-    	incq %r9                    # increment leaf_counter if level 2 node is a leaf
+    cmpq $0, %r12
+    jne not_leaf2
+    incq %r9                    # increment leaf_counter if level 2 node is a leaf
+    jmp level2_continue
+level2_leaf:
+    incq %r9                    # increment leaf_counter if level 2 node is a leaf
+    jmp level2_continue
 not_leaf2:
-    	incq %r8                    # increment v_counter for level 2 node
-    	addq $8, %r12               # move to the next son in level 2 array
-    	jmp level2
-level2_end:
-    	cmpq $0, %r11		    # if not equal then not leaf and no need to count as leaf
-    	jne not_leaf1
-    	incq %r9                    # increment leaf_counter if level 1 node is a leaf
+    incq %r8                    # increment v_counter for level 2 node
+level2_continue:
+    addq $8, %r12               # move to the next son in level 2 array
+    jmp level2
+level2_end:			
+    cmpq $0, %r11		# if not equal then not leaf and no need to count as leaf
+    jne not_leaf1
+    incq %r9                    # increment leaf_counter if level 1 node is a leaf
+    jmp level1_continue
+level1_leaf:
+    incq %r9                    # increment leaf_counter if level 1 node is a leaf
+    jmp level1_continue
 not_leaf1:
-    	incq %r8                    # increment v_counter for level 1 node
-    	addq $8, %r11               # move to the next son in level 1 array
-    	jmp level1
+    incq %r8                    # increment v_counter for level 1 node
+level1_continue:
+    addq $8, %r11               # move to the next son in level 1 array
+    jmp level1
 level1_end:
-    	incq %r8                    # count root itself as a vertex
+    incq %r8                    # count root itself as a vertex
 
 end_check:
-    	# Check if leaf_counter / (v_counter - leaf_counter) <= 3
-    	movq %r9, %rax              # leaf_counter into rax
-    	imulq $3, %r9               # leaf_counter * 3
-    	subq %r9, %r8               # v_counter - leaf_counter * 3
-    	cmpq %r8, %r9               # Compare (leaf_counter * 3) with (v_counter - leaf_counter)
-    	jg not_rich
-    	movb $1, rich               # Set rich to 1 if the condition is met
-    	jmp end
+    # Check if leaf_counter / (v_counter - leaf_counter) <= 3
+    movq %r9, %rax              # leaf_counter into rax
+    imulq $3, %r9               # leaf_counter * 3
+    subq %r9, %r8               # v_counter - leaf_counter * 3
+    cmpq %r8, %r9               # compare (leaf_counter * 3) with (v_counter - leaf_counter)
+    jg not_rich
+    movb $1, rich               # set rich to 1 if the condition is met
+    jmp end_program
 not_rich:
-    	movb $0, rich               # Set rich to 0 if the condition is not met
+    movb $0, rich               # set rich to 0 if the condition is not met
+
 
 end:
 
