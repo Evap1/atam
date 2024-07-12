@@ -5,7 +5,7 @@ _start:
     movq $0, %r8 		# vertex_counter = 0
     movq $0, %r9 		# leaf_counter = 0
     movq root, %r10 	# node_level1 = root_array[0]
-
+    movb $0 , rich
 
     # start traversal from root
     movq (%r10), %r11           # load the first son of the root
@@ -49,7 +49,7 @@ level6:
     cmpq $0, %rax            
     je level6_end
     incq %r8                   
-    addq $8, %rax             
+    movq 8(%rax), %rax             
     jmp level6
 level6_end:
     cmpq $0, %r15
@@ -62,7 +62,7 @@ level5_leaf:
 not_leaf5:
     incq %r8                    # increment v_counter for level 5 node
 level5_continue:
-    addq $8, %r15               # move to the next son in level 5 array
+    movq 8(%r15), %r15               # move to the next son in level 5 array
     jmp level5
 level5_end:
     cmpq $0, %r14
@@ -75,7 +75,7 @@ level4_leaf:
 not_leaf4:
     incq %r8                    # increment v_counter for level 4 node
 level4_continue:
-    addq $8, %r14               # move to the next son in level 4 array
+    movq 8(%r14), %r14               # move to the next son in level 4 array
     jmp level4
 level4_end:
     cmpq $0, %r13
@@ -88,7 +88,7 @@ level3_leaf:
 not_leaf3:
     incq %r8                    # increment v_counter for level 3 node
 level3_continue:
-    addq $8, %r13               # move to the next son in level 3 array
+    movq 8(%r13), %r13               # move to the next son in level 3 array
     jmp level3
 level3_end:
     cmpq $0, %r12
@@ -101,7 +101,7 @@ level2_leaf:
 not_leaf2:
     incq %r8                    # increment v_counter for level 2 node
 level2_continue:
-    addq $8, %r12               # move to the next son in level 2 array
+    movq 8(%r12), %r12               # move to the next son in level 2 array
     jmp level2
 level2_end:			
     cmpq $0, %r11		# if not equal then not leaf and no need to count as leaf
@@ -114,7 +114,7 @@ level1_leaf:
 not_leaf1:
     incq %r8                    # increment v_counter for level 1 node
 level1_continue:
-    addq $8, %r11               # move to the next son in level 1 array
+    movq 8(%r11), %r11               # move to the next son in level 1 array
     jmp level1
 level1_end:
     incq %r8                    # count root itself as a vertex
