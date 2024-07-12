@@ -140,7 +140,7 @@ not_monotonic:
     jmp check_nodes              # Jump to next node out of the 3
 
 end_check:
-    movq %r9, result             # Store the value of %r9 into the address of the label 'result'
+    movb %r9, result             # Store the value of %r9 into the address of the label 'result'
 
     # Print "result="
     movq $1, %rax            # syscall number for sys_write
@@ -182,3 +182,28 @@ newline:
 .section .data
 result_buf:
     .byte ' '                # initialize with a space character (' ')
+
+Node1: 
+    .quad 0
+    .int 1
+    .quad Node2
+Node2: 
+    .quad Node1
+    .int 4
+    .quad Node3
+Node3: 
+    .quad Node2
+    .int 7
+    .quad Node4
+Node4: 
+    .quad Node3
+    .int 12
+    .quad Node5
+Node5: 
+    .quad Node4
+    .int 13
+    .quad Node6
+Node6: 
+    .quad Node5
+    .int 13
+    .quad Node7
