@@ -12,17 +12,16 @@ check_nodes:
     # Check if there are at least 3 elements from the left
     movq 0(%r10), %r12            # Load prev pointer
     cmpq $0, %r12                 # Check if prev is nullptr
-    je right_check                # If so, skip checks and increment result
+    je right_check                # If so, skip left
 
     movq 0(%r12), %r13            # Load prev of prev pointer
     cmpq $0, %r13                 # Check if prev of prev is nullptr
-    je right_check                # If so, skip checks and increment result
+    je right_check                # If so, skip left
 
     movq 0(%r13), %r14            # Load prev of prev of prev pointer
 inner_left_check:
     cmpq $0, %r14                 # Check if prev of prev of prev is nullptr
-    je right_check                # If so, skip checks and increment result
-
+    je right_check                # If so, skip left
   
     movl 8(%r12), %eax            # Load prev->data
     movl 8(%r13), %ebx            # Load prev of prev->data
