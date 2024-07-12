@@ -1,6 +1,6 @@
 .global _start
 _start:
-  movq $0, %r9                  # Initialize result to 0
+    movq $0, %r9                  # Initialize result to 0
     movq $0, %r8                  # Initialize index i to 0
 
 check_next_node:
@@ -12,9 +12,10 @@ check_next_node:
     # Check left monotonicity
     movq %r10, %r11               # current = currentNode
     movb $1, %al                  # Set leftMonotonic to true
+    movb $1, %bl                  # Set leftMonotonicDecreasing to true
 
 check_left_monotonic:
-    movq 0(%r11), %r12            # Load prev pointer (8 bytes)
+    movq 0(%r11), %r12            # Load prev pointer
     cmpq $0, %r12                 # Check if prev is nullptr
     je end_check_left             # If so, end check
 
@@ -22,27 +23,74 @@ check_left_monotonic:
     movl 8(%r11), %eax            # Load currentNode->data
     movl 8(%r12), %ebx            # Load prev->data
 
-    # Compare data values
+    # Compare data values for increasing
     cmpl %ebx, %eax               # Compare currentNode->data and prev->data
-    jg not_left_monotonic         # If currentNode->data > prev->data, not monotonic
+    jl not_left_monotonic_increasing
+    jg not_left_monotonic_decreasing
 
+    # Move to the previous node
     movq %r12, %r11               # Move to the previous node
     jmp check_left_monotonic
 
-not_left_monotonic:
+not_left_monotonic_increasing:
     movb $0, %al                  # Set leftMonotonic to false
+
+not_left_monotonic_decreasing:
+    movb $0, %bl                  # Set leftMonotonicDecreasing to false
 
 end_check_left:
 
-    # Check if left is monotonic
-    testb %al, %al                # If leftMonotonic
-    jz next_node                  # If not, skip
+    # Reset for right-side check
+    movq %r10, %r11               # Reset current to currentNode
+    movb $1, %cl                  # Set rightMonotonic to true
+    movb $1, %dl                  # Set rightMonotonicDecreasing to true
 
-    incq %r9                      # Increment result if left is monotonic
+check_right_monotonic:
+    movq 16(%r11), %r12           # Load next pointer
+    cmpq $0, %r12                 # Check if next is nullptr
+    je end_check_right            # If so, end check
 
-next_node:
-    incq %r8                      # Increment i
-    jmp check_next_node
+    # Load data from currentNode and next
+    movl 8(%r11), %eax            # Load currentNode->data
+    movl 8(%r12), %ebx            # Load next->data
+
+    # Compare data values for increasing
+    cmpl %ebx, %eax               # Compare currentNode->data and next->data
+    jl not_right_monotonic_increasing
+    jg not_right_monotonic_decreasing
+
+    # Move to the next node
+    movq %r12, %r11               # Move to the next node
+    jmp check_right_monotonic
+
+not_right_monotonic_increasing:
+    movb $0, %cl                  # Set rightMonotonic to false
+
+not_right_monotonic_decreasing:
+    movb $0, %dl                  # Set rightMonotonicDecreasing to false
+
+end_check_right:
+
+    # Increment result if both sides are monotonic
+    testb %al, %al                # Check leftMonotonic
+    jz check_left_decreasing
+
+    testb %bl, %bl                # Check leftMonotonicDecreasing
+    jz check_right
+
+check_left_decreasing:
+    testb %cl, %cl                # Check rightMonotonic
+    jz check_right_decreasing
+
+check_right:
+    testb %dl, %dl                # Check rightMonotonicDecreasing
+    jnz increment_result
+
+check_right_decreasing:
+    jmp end_check
+
+increment_result:
+    incq %r9                      # Increment result
 
 end_check:
     movq %r9, result(%rip)        # Store result
