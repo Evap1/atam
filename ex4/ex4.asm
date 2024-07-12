@@ -45,15 +45,15 @@ check_ecx:
     jmp inner_left_check
 right_check:
     # Check if there are at least 3 elements to the right
-    movq 0(%r10, 8), %r12         # Load next pointer
+    movq 8(%r10), %r12            # Load next pointer
     cmpq $0, %r12                 # Check if next is nullptr
     je increment_result           # If so, increment result and skip checks
 
-    movq 0(%r12, 8), %r13         # Load next of next pointer
+    movq 8(%r12), %r13            # Load next of next pointer
     cmpq $0, %r13                 # Check if next of next is nullptr
     je increment_result           # If so, increment result and skip checks
 
-    movq 0(%r13, 8), %r14         # Load next of next of next pointer
+    movq 8(%r13), %r14            # Load next of next of next pointer
 inner_right_check:
     cmpq $0, %r14                 # Check if next of next of next is nullptr
     je increment_result           # If so, increment result and skip checks
