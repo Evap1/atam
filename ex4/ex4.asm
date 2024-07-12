@@ -29,7 +29,9 @@ inner_left_check:
 
     # Check for maxima or minima conditions
     cmp %eax, %ebx                # Compare prev->data with prev of prev->data
-    jl check_ecx                  # If prev < prev of prev, check the next
+    jl check_ebx_ecx           # If prev < prev of prev, check the next
+    jg check_ecx_ebx           # If prev > prev of prev, check the next
+    je equal_label_left
 
     cmp %ebx, %ecx                # Compare prev of prev->data with prev of prev of prev->data
     jl not_monotonic              # If prev of prev < prev of prev of prev, it's not monotonic
@@ -39,6 +41,7 @@ check_ecx:
     jl not_monotonic              # If prev < prev of prev of prev, it's not monotonic
 
     # Move to the next previous node for continued checking
+equal_label_left:
     movq %r13, %r12               # Move prev of prev to prev
     movq %r14, %r13               # Move prev of prev of prev to prev of prev
     jmp inner_left_check
@@ -61,22 +64,24 @@ inner_right_check:
     movl 8(%r13), %ebx            # Load next of next->data
     movl 8(%r14), %ecx            # Load next of next of next->data
 
-    # Check for maxima or minima conditions
-    cmp %eax, %ebx                # Compare next->data with next of next->data
-    jg check_ecx_right            # If next > next of next, check the next
+   # Check for maxima or minima conditions for the right side
+cmp %eax, %ebx                  # Compare next->data with next of next->data
+jl check_ebx_ecx_right          # If next < next of next, check the next
+jg check_ecx_right              # If next > next of next, check the next
+je equal_label_right             # If equal, continue checking
 
-    cmp %ebx, %ecx                # Compare next of next->data with next of next of next->data
-    jg not_monotonic              # If next of next > next of next of next, it's not monotonic
+cmp %ebx, %ecx                  # Compare next of next->data with next of next of next->data
+jl not_monotonic                # If next of next < next of next of next, it's not monotonic
 
 check_ecx_right:
-    cmp %eax, %ecx                # Compare next->data with next of next of next->data
-    jg not_monotonic              # If next > next of next of next, it's not monotonic
+cmp %eax, %ecx                  # Compare next->data with next of next of next->data
+jl not_monotonic                # If next < next of next of next, it's not monotonic
 
-    # Move to the next next node for continued checking
-    movq %r13, %r12               # Move next of next to next
-    movq %r14, %r13               # Move next of next of next to next of next
-    jmp inner_right_check
-
+# Move to the next next node for continued checking
+equal_label_right:
+movq %r13, %r12                 # Move next of next to next
+movq %r14, %r13                 # Move next of next of next to next of next
+jmp inner_right_check
 increment_result:
     incq %r9                      # Increment result if monotonic
     incq %r8                      # Increment index i
