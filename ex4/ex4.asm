@@ -1,7 +1,31 @@
 .global _start
 
 _start:
- # Initialize result to 0
+.section .data
+nodes:
+    .quad Node2
+    .quad Node1
+    .quad Node3
+result:
+    .byte 0
+
+Node1: 
+    .quad 0
+    .int 1
+    .quad Node2
+Node2: 
+    .quad Node1
+    .int 4
+    .quad Node3
+Node3: 
+    .quad Node2
+    .int 7
+    .quad 0
+
+.section .text
+.global _start
+_start:
+    # Initialize result to 0
     movb $0, result
 
     # Initialize loop counter to 0
@@ -35,11 +59,11 @@ check_left:
     jz check_right   # If %r14 == NULL, jump to check_right
 
     movl 8(%r8), %r15d  # %r15d = leftPtr->data
-    movl 8(%r14), %rsi  # %rsi = leftPrev->data
+    movl 8(%r14), %edx  # %edx = leftPrev->data
 
-    cmpq %r15, %rsi
+    cmpq %r15, %rdx
     jl not_left_non_increasing
-    cmpq %r15, %rsi
+    cmpq %r15, %rdx
     jg not_left_non_decreasing
 
     movq %r14, %r8  # leftPtr = leftPrev
@@ -68,11 +92,11 @@ check_right_inner:
     jz finalize_check   # If %r14 == NULL, jump to finalize_check
 
     movl 8(%r8), %r15d  # %r15d = rightPtr->data
-    movl 8(%r14), %rsi  # %rsi = rightNext->data
+    movl 8(%r14), %edx  # %edx = rightNext->data
 
-    cmpq %r15, %rsi
+    cmpq %r15, %rdx
     jl not_right_non_increasing
-    cmpq %r15, %rsi
+    cmpq %r15, %rdx
     jg not_right_non_decreasing
 
     movq %r14, %r8  # rightPtr = rightNext
