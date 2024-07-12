@@ -10,6 +10,7 @@ check_nodes:
     movq nodes(, %r8, 8), %r10  # Load currentNode = nodes[i]
     
     # Check if there are at least 3 elements from the left
+inner_left_check:
     movq 0(%r10), %r12          # Load prev pointer
     cmpq $0, %r12               # Check if prev is nullptr
     je right_check              # If so, skip left
@@ -19,7 +20,6 @@ check_nodes:
     je right_check              # If so, skip left
 
     movq 0(%r13), %r14          # Load prev of prev of prev pointer
-inner_left_check:
     cmpq $0, %r14               # Check if prev of prev of prev is nullptr
     je right_check              # If so, skip left
   
@@ -49,6 +49,7 @@ equal_label_left:
 
 right_check:
     # Check if there are at least 3 elements to the right
+inner_right_check:
     movq 12(%r10), %r12          # Load next pointer
     cmpq $0, %r12               # Check if next is nullptr
     je increment_result          # If so, increment result and skip checks
@@ -58,7 +59,6 @@ right_check:
     je increment_result          # If so, increment result and skip checks
 
     movq 12(%r13), %r14          # Load next of next of next pointer
-inner_right_check:
     cmpq $0, %r14               # Check if next of next of next is nullptr
     je increment_result          # If so, increment result and skip checks
 
