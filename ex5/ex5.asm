@@ -10,7 +10,7 @@ _start:
   jle return_true              # If so, return 1
 
   # Load first three elements
-leaq series, %r10
+leaq (series), %r10
 movq $0,%r13
 movl (0)%r10, %r13d        # a1
 movq $0,%r14
