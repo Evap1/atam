@@ -56,7 +56,7 @@ check_geometric_diff:
   subl %r14d, %eax             # eax = a3 - a2 eax is the divedend
   cdq                          # sign extansion
   movl %r14d, %r9d             # r9d = a2
-  subl %r13d, %r9d             # r9d = a2 - a1 ecx is the devisor. it is not possible to devide by edx!
+  subl %r13d, %r9d             # r9d = a2 - a1 r9d is the devisor. it is not possible to devide by edx!
   idivl %r9d                   # eax = q1
 
   movl %eax, %r12d             # r12d = q1
@@ -74,10 +74,11 @@ check_geometric_diff_loop:
 
   # Calculate (A(i+1) - A(i)) / (A(i) - A(i-1))
   movl %r10d, %eax             # eax = A(i+1)
-  subl %r9d, %eax              # eax = A(i+1) - A(i)
-  movl %r9d, %edx              # edx = A(i)
-  subl %r11d, %edx             # edx = A(i) - A(i-1)
-  idivl %edx                   # eax = (A(i+1) - A(i)) / (A(i) - A(i-1))
+  subl %r9d, %eax              # eax = A(i+1) - A(i) eax is the divedend
+  cdq                          # sign extansion
+  #movl %r9d, %edx              # edx = A(i)
+  subl %r11d, %r9d             # edx = A(i) - A(i-1) r9d is the devisor. it is not possible to devide by edx!
+  idivl %r9d                   # eax = (A(i+1) - A(i)) / (A(i) - A(i-1))
 
   # Compare with q1
   cmpl %r12d, %eax
