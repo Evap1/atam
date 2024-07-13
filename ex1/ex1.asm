@@ -12,6 +12,7 @@ _start:
     movb $1 , Legal
     movq (%r9, %r11, 4), %r12
     movl %r12d, num
+    j end
 not_legal_HW1:
     movb $0, Legal
 end:
