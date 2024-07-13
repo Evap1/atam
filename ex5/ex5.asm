@@ -81,7 +81,6 @@ return_true:
 
 end:
 
-
 # Print "seconddegree="
     movq $1, %rax                # syscall number for sys_write
     movq $1, %rdi                # file descriptor (stdout)
