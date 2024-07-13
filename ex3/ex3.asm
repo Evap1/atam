@@ -110,22 +110,21 @@ level2_end:
     jmp level1_continue
 level1_leaf:
     incq %r9                    # increment leaf_counter if level 1 node is a leaf
-    jmp level1_continue
+    jmp level2_continue
 not_leaf1:
     incq %r8                    # increment v_counter for level 1 node
 level1_continue:
-    movq 8(%r11), %r11               # move to the next son in level 1 array
+    addq $8, %r10
+    movq (%r10), %r11               # move to the next son in level 1 array
     jmp level1
 level1_end:
     incq %r8                    # count root itself as a vertex
 
 end_check:
     # Check if leaf_counter / (v_counter - leaf_counter) <= 3
-    movq %r9, %rax              # leaf_counter into rax
     imulq $3, %r9               # leaf_counter * 3
-    subq %r9, %r8               # v_counter - leaf_counter * 3
     cmpq %r8, %r9               # compare (leaf_counter * 3) with (v_counter - leaf_counter)
-    jg not_rich
+    jb not_rich
     movb $1, rich               # set rich to 1 if the condition is met
     jmp end
 not_rich:
