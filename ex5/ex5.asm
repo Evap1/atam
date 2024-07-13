@@ -53,10 +53,11 @@ check_arithmetic_diff:
 check_geometric_diff:
   # Calculate q1 = (a3 - a2) / (a2 - a1)
   movl %r15d, %eax             # eax = a3
-  subl %r14d, %eax             # eax = a3 - a2
-  movl %r14d, %edx             # edx = a2
-  subl %r13d, %edx             # edx = a2 - a1
-  idivl %edx                   # eax = q1
+  subl %r14d, %eax             # eax = a3 - a2 eax is the divedend
+  cdq                          # sign extansion
+  movl %r14d, %r9d             # r9d = a2
+  subl %r13d, %r9d             # r9d = a2 - a1 ecx is the devisor. it is not possible to devide by edx!
+  idivl %r9d                   # eax = q1
 
   movl %eax, %r12d             # r12d = q1
 
