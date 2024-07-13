@@ -5,7 +5,7 @@ _start:
     movq size, %rcx              # Load size of series
 
     cmpq $3, %rcx                # Check if size < 3
-    jle return_true               # If so, return 1
+    jle return_true              # If so, return 1
 
     # Load first three elements
     movl series, %eax            # a1
@@ -63,28 +63,47 @@ check_geometric_diff_false:
 
 next_iteration:
     incq %r8                       # Increment index i
-    jmp check_loop                 # Repeat for next element
+
+    # Check if all flags are false
+    movb $0, %al                  # Initialize result to 0
+    or %bl, %al                   # Check arithmetic_diff
+    or %bh, %al                   # Check geometric_diff
+    or %r10b, %al                 # Check arithmetic_quot
+    or %r11b, %al                 # Check geometric_quot
+
+    testb %al, %al                # Check if any flag is true
+    jz return_zero                # If all are false, return 0
+
+    jmp check_loop                # Repeat for next element
+
+return_zero:
+    movb $0, seconddegree         # Set seconddegree to 0
+    jmp end                       # Exit loop
 
 finish_check:
-    # Check final flags and set result
+    # Combine boolean flags
+    movb $0, %al                  # Initialize result to 0
+
+    # Check arithmetic_diff
     testb %bl, %bl
-    jz not_arithmetic
+    jnz set_result_true           # If true, set result to 1
 
+    # Check geometric_diff
     testb %bh, %bh
-    jz not_geometric
+    jnz set_result_true           # If true, set result to 1
 
-    movl $1, result               # Set result to 1
-    jmp end
+    # Check arithmetic_quot
+    testb %r10b, %r10b
+    jnz set_result_true           # If true, set result to 1
 
-not_arithmetic:
-    testb %bh, %bh
-    jz not_geometric
+    # Check geometric_quot
+    testb %r11b, %r11b
+    jnz set_result_true           # If true, set result to 1
 
-    movl $1, result               # Set result to 1
-    jmp end
+    jmp end                       # If all false, result remains 0
 
-not_geometric:
-    movl $0, result               # Set result to 0
+set_result_true:
+    movb $1, seconddegree        # Set seconddegree to 1
 
 end:
 
@@ -135,3 +154,4 @@ newline:
 
 .section .bss
     .lcomm seconddegree_buf, 13  # buffer to hold string representation of seconddegree
+    .lcomm seconddegree, 1         # buffer to hold seconddegree result (1 byte)
