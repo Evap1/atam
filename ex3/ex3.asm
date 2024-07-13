@@ -4,7 +4,7 @@
 _start:
     movq $0, %r8 		# vertex_counter = 0
     movq $0, %r9 		# leaf_counter = 0
-    movq root, %r10 	# node_level1 = root_array[0]
+    leaq root, %r10 	# node_level1 = root_array[0]
     movb $0 , rich
 
     # start traversal from root
