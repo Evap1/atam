@@ -88,14 +88,42 @@ end:
   movq $0, %rdi                # exit status (0 for success)
   syscall
 
-bad_exit:
-  movq $60, %rax               # syscall number for sys_exit
-  movq $1, %rdi                # exit status (1 for failure)
-  syscall
+# Print "seconddegree="
+movq $1, %rax                # syscall number for sys_write
+movq $1, %rdi                # file descriptor (stdout)
+lea seconddegree_label(%rip), %rsi  # address of seconddegree_label
+movq $13, %rdx               # number of bytes to write
+syscall                      # print "seconddegree="
 
-.section .data
-series: .int 2, 6, 18, 54, 162, 486
-size: .int 6
+# Print the value of seconddegree
+movzbl seconddegree(%rip), %eax  # move the value into %eax and zero-extend
+movq $seconddegree_buf + 12, %rsi # point to the end of the buffer
+movb $0, (%rsi)              # null-terminate the string
 
-.section .bss
-seconddegree: .byte 0          # buffer to hold seconddegree result (1 byte)
+convert_seconddegree_to_str:
+    dec %rsi                     # move pointer backwards
+    movl $10, %ecx               # base 10
+    xor %edx, %edx               # clear %edx for division
+    div %ecx                     # divide %eax by 10
+    addb $'0', %dl               # convert remainder to ASCII
+    movb %dl, (%rsi)             # store character in buffer
+    test %eax, %eax              # check if quotient is zero
+    jnz convert_seconddegree_to_str # loop if quotient is not zero
+
+# Print the string representation of 'seconddegree'
+movq $1, %rax                # syscall number for sys_write
+movq $1, %rdi                # file descriptor (stdout)
+movq %rsi, %rdx              # address of the string
+movq $seconddegree_buf + 12, %rcx
+sub %rsi, %rcx               # calculate the string length
+movq %rsi, %rsi              # address of the string
+movq %rcx, %rdx              # number of bytes to write
+syscall                      # print seconddegree
+
+# Print a newline
+movq $1, %rax                # syscall number for sys_write
+movq $1, %rdi                # file descriptor (stdout)
+lea newline(%rip), %rsi      # address of newline character
+movq $1, %rdx                # number of bytes to write
+syscall                      # print newline
+
