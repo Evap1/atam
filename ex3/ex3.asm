@@ -125,7 +125,12 @@ level1_continue:
     addq $8, %r10
     movq (%r10), %r11               # move to the next son in level 1 array
     jmp level1
+level1_root:
+    incq %r9
+    jmp end_check
 level1_end:
+    cmpq $0, %r9                # check if it's the first leaf => root it the only vertex
+    je level1_root
     incq %r8                    # count root itself as a vertex
 
 end_check:
