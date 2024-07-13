@@ -135,8 +135,8 @@ check_geometric_quot:
   # Calculate q2 = (a3 * a1) / (a2 * a2)
   movslq %r12d, %r12
   movslq %r13d, %r13
-  movslq $r14d, %r14
-  movslq $r15d, %r15
+  movslq %r14d, %r14
+  movslq %r15d, %r15
   movq %r14, %rax             # rax = a2
   imulq %r14, %rax            # rax = a2 * a2
   movq %rax, %r9
@@ -159,8 +159,8 @@ check_geometric_quot_loop:
 
   # Calculate (A(i+1) * A(i-1)) / (A(i) * A(i))
   movslq %r9d, %r9
-  movslq $r10d, %r10
-  movslq $r11d, %r11
+  movslq %r10d, %r10
+  movslq %r11d, %r11
   movq %r9, %rax              # rax = A(i)
   imulq %r9, %rax             # rax = A(i) * A(i)
   movq %rax, %r9
