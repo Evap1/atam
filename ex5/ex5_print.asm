@@ -1,3 +1,90 @@
+.global _start
+
+_start:
+    movq $0, %r8                 # Initialize index i to 0
+    movq size, %rcx              # Load size of series
+
+    cmpq $3, %rcx                # Check if size < 3
+    jle return_true               # If so, return 1
+
+    # Load first three elements
+    movl series, %eax            # a1
+    movl series + 4, %ebx        # a2
+    movl series + 8, %ecx        # a3
+
+    # Calculate d and q
+    lea -2 * %ebx + %eax + %ecx, %edx   # d = -2*a2 + a1 + a3
+    imull %eax, %eax               # a1 * a3
+    imull %ebx, %ebx               # a2 * a2
+    idivl %ebx                     # q = a1 * a3 / (a2 * a2)
+
+    # Initialize boolean flags
+    movb $1, arithmetic_diff
+    movb $1, geometric_diff
+    movb $1, arithmetic_quot
+    movb $1, geometric_quot
+
+    # Check subsequent elements
+    movq $3, %r8                 # Start from a4
+check_loop:
+    cmpq %rcx, %r8                # Compare with size
+    jge finish_check              # If i >= size, finish checking
+
+    # Decrement index for previous element
+    decq %r8
+    movl series(, %r8, 4), %esi   # Load series[i-1]
+    incq %r8                       # Increment back for current index
+    movl series(, %r8, 4), %edi    # Load series[i]
+
+    # Check differences for arithmetic and geometric
+    subl %esi, %edi               # ai - a(i-1)
+    cmp %edx, %eax                # Compare with d
+    jne check_arithmetic_diff_false
+    jmp check_geometric_diff
+
+check_arithmetic_diff_false:
+    movb $0, arithmetic_diff       # Set to false if not matching
+
+check_geometric_diff:
+    # Perform geometric check
+    imull %esi                     # ai / a(i-1)
+    cmp %ecx, %edx                # Compare with q
+    jne check_geometric_diff_false
+    jmp next_iteration
+
+check_geometric_diff_false:
+    movb $0, geometric_quot       # Set to false if not matching
+
+next_iteration:
+    incq %r8                       # Increment index i
+    jmp check_loop                 # Repeat for next element
+
+finish_check:
+    # Check final flags and set result
+    movb arithmetic_diff, %al
+    testb %al, %al
+    jz not_arithmetic
+
+    movb geometric_diff, %al
+    testb %al, %al
+    jz not_geometric
+
+    movl $1, result               # Set result to 1
+    jmp end
+
+not_arithmetic:
+    movb geometric_diff, %al
+    testb %al, %al
+    jz not_geometric
+
+    movl $1, result               # Set result to 1
+    jmp end
+
+not_geometric:
+    movl $0, result               # Set result to 0
+
+end:
+
 # Print "seconddegree="
     movq $1, %rax                # syscall number for sys_write
     movq $1, %rdi                # file descriptor (stdout)
@@ -38,11 +125,9 @@ convert_seconddegree_to_str:
     syscall                      # make the syscall to print newline
 
     # Exit the program
-    movq $60, %rax               # syscall number for sys_exit
-    xor %rdi, %rdi               # exit status (0 for success)
-    syscall                      # make the syscall to exit the program
+    # (Removed as requested)
 
-    .section .rodata
+.section .rodata
 seconddegree_label:
     .asciz "seconddegree="
 newline:
