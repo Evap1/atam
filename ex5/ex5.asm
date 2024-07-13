@@ -10,21 +10,22 @@ _start:
   jle return_true              # If so, return 1
 
   # Load first three elements
-  movl series, %eax            # a1
-  movl series + 4, %ebx        # a2
-  movl series + 8, %ecx        # a3
+  movq series, %rax            # a1
+  movq series + 8, %rbx        # a2
+  movq series + 16, %rcx       # a3
 
   # Calculate d = -2 * a2 + a1 + a3
-  movl %ebx, %edx              # Move a2 into edx
-  shll $1, %edx                 # Multiply by 2
-  negl %edx                     # Negate to get -2 * a2
-  addl %eax, %edx              # Add a1
-  addl %ecx, %edx              # Add a3
+  movq %rbx, %rdx              # Move a2 into rdx
+  shlq $1, %rdx                 # Multiply by 2
+  neg %rdx                      # Negate to get -2 * a2
+  addq %rax, %rdx              # Add a1
+  addq %rcx, %rdx              # Add a3
 
   # Calculate q = a1 * a3 / (a2 * a2)
-  imull %eax, %eax              # a1 * a3
-  imull %ebx, %ebx              # a2 * a2
-  idivl %ebx                     # q = a1 * a3 / (a2 * a2)
+  imulq %rcx, %rax              # a1 * a3
+  imulq %rbx, %rbx              # a2 * a2
+  cqo                           # Sign-extend rax to rdx for division
+  idivq %rbx                    # q = a1 * a3 / (a2 * a2)
 
   # Initialize boolean flags in registers
   movb $1, %bl                  # arithmetic_diff
@@ -40,13 +41,13 @@ check_loop:
 
   # Decrement index for previous element
   decq %r8
-  movl series(, %r8, 4), %esi   # Load series[i-1]
+  movq series(, %r8, 8), %rsi    # Load series[i-1]
   incq %r8                       # Increment back for current index
-  movl series(, %r8, 4), %edi    # Load series[i]
+  movq series(, %r8, 8), %rdi    # Load series[i]
 
   # Check differences for arithmetic and geometric
-  subl %esi, %edi               # ai - a(i-1)
-  cmp %edx, %eax                # Compare with d
+  subq %rsi, %rdi               # ai - a(i-1)
+  cmp %rdx, %rax                # Compare with d
   jne check_arithmetic_diff_false
   jmp check_geometric_diff
 
@@ -55,8 +56,8 @@ check_arithmetic_diff_false:
 
 check_geometric_diff:
   # Perform geometric check
-  imull %esi                     # ai / a(i-1)
-  cmp %ecx, %edx                # Compare with q
+  imulq %rsi                     # ai / a(i-1)
+  cmp %rcx, %rdx                # Compare with q
   jne check_geometric_diff_false
   jmp next_iteration
 
@@ -89,18 +90,18 @@ end:
     syscall                      # make the syscall to print "seconddegree="
 
     # Convert the value of 'seconddegree' to a string
-    movzbl seconddegree(%rip), %eax  # move the value of seconddegree into %eax and zero-extend
+    movzbl seconddegree(%rip), %rax  # move the value of seconddegree into %rax and zero-extend
     movq $seconddegree_buf + 12, %rsi # point to the end of the buffer
     movb $0, (%rsi)              # null-terminate the string
 
 convert_seconddegree_to_str:
     dec %rsi                     # move pointer backwards
     movl $10, %ecx               # base 10
-    xor %edx, %edx               # clear %edx for division
-    div %ecx                     # divide %eax by 10
+    xor %rdx, %rdx               # clear %rdx for division
+    div %ecx                     # divide %rax by 10
     addb $'0', %dl               # convert remainder to ASCII
     movb %dl, (%rsi)             # store character in buffer
-    test %eax, %eax              # check if quotient is zero
+    test %rax, %rax              # check if quotient is zero
     jnz convert_seconddegree_to_str # loop if quotient is not zero
 
     # Print the string representation of 'seconddegree'
@@ -125,7 +126,7 @@ convert_seconddegree_to_str:
     xor %rdi, %rdi               # exit status (0 for success)
     syscall                      # make the syscall to exit the program
 
-    .section .rodata
+.section .rodata
 seconddegree_label:
     .asciz "seconddegree="
 newline:
