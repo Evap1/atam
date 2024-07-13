@@ -3,7 +3,7 @@
 .section .text
 _start:
     movq Adress, %r9
-    cmpq $0, $r9
+    cmpq $0, %r9
     je not_legal_HW1
     movslq length, %r10
     movslq Index, %r11
