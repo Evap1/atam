@@ -5,9 +5,10 @@
 _start:
   # Load the size of the series
   movl size, %ecx              # %ecx holds the size of the series
+  subl $1, %ecx
 
-  # Check if size < 3, if so, set seconddegree to 1 and exit
-  cmpl $3, %ecx
+  # Check if size -1 < 3-1, if so, set seconddegree to 1 and exit
+  cmpl $2, %ecx
   jl return_true
 
   # Load the first three elements
