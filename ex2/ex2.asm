@@ -109,25 +109,3 @@ not_science_HW1:
 
 update_type4_HW1:
     movb $4, type            # Set type to 4
-
-end:
-    # pseudo code
-    # type = 3
-    # if size%8 == 0
-    #   for I in size%8
-    #       if data[I] == 0
-    #           type = 4
-    # if type = 3 : end
-    #
-    # loop_simple_HW1:
-    # type = 1
-    # for I in size:
-    #   if data[I] is not in simple set
-    #       type = 2
-    # if type = 1 end:
-    #
-    # loop_science_HW1:
-    # for I in size:
-    #   if data[I] is not in science set
-    #       type = 4
-    # end:
