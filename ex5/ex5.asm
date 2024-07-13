@@ -154,11 +154,13 @@ check_geometric_quot_loop:
   movl series-4(,%ebx,4), %r11d # r11d = series[i-1]
 
   # Calculate (A(i+1) * A(i-1)) / (A(i) * A(i))
+  movl %r9d, %eax              # eax = A(i)
+  imull %r9d, %eax             # eax = A(i) * A(i)
+  movl %eax, %r9d
   movl %r10d, %eax             # eax = A(i+1)
   imull %r11d, %eax            # eax = A(i+1) * A(i-1)
-  movl %r9d, %edx              # edx = A(i)
-  imull %edx                   # edx:eax = A(i+1) * A(i-1)
-  idivl %edx                   # eax = (A(i+1) * A(i-1)) / (A(i) * A(i))
+  cdq
+  idivl %r9d                   # eax = (A(i+1) * A(i-1)) / (A(i) * A(i)) r9d is the devisor. it is not possible to devide by edx!
 
   # Compare with q2
   cmpl %r12d, %eax
