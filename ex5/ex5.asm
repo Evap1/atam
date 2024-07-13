@@ -80,13 +80,6 @@ return_true:
   jmp end                       # Exit
 
 end:
-  # Check seconddegree
-  cmpl $1, seconddegree
-  jne bad_exit
-
-  movq $60, %rax               # syscall number for sys_exit
-  movq $0, %rdi                # exit status (0 for success)
-  syscall
 
 # Print "seconddegree="
 movq $1, %rax                # syscall number for sys_write
@@ -96,7 +89,7 @@ movq $13, %rdx               # number of bytes to write
 syscall                      # print "seconddegree="
 
 # Print the value of seconddegree
-movzbl seconddegree(%rip), %eax  # move the value into %eax and zero-extend
+movzbl seconddegree, %eax   # move the value into %eax
 movq $seconddegree_buf + 12, %rsi # point to the end of the buffer
 movb $0, (%rsi)              # null-terminate the string
 
