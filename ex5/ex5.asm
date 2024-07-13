@@ -3,88 +3,165 @@
 .section .text
 
 _start:
-  movq $0, %r8                 # Initialize index i to 0
-  movq size, %rcx              # Load size of series
+  # Load the size of the series
+  movl size, %ecx              # %ecx holds the size of the series
 
-  cmpq $3, %rcx                # Check if size < 3
-  jle return_true              # If so, return 1
+  # Check if size < 3, if so, return 1
+  cmpl $3, %ecx
+  jl return_true
 
-  # Load first three elements
-leaq (series), %r10
-movl (0)%r10, %r13d        # a1
-movl (4)%r10, %r14d       # a2
-movl (8)%r10, %r15d        # a3
+  # Load the first three elements
+  movl series, %r13d           # a1
+  movl series + 4, %r14d       # a2
+  movl series + 8, %r15d       # a3
 
-# Calculate q = a1 * a3 / (a2 * a2)
-imulq %r15, %r13             # a1 * a3
-movq %r14, %rdi              # Load a2 for multiplication
-imulq %rdi                   # a2 * a2
-xor %rdx, %rdx               # Clear rdx for division
-divq %rdi                     # q = a1 * a3 / (a2 * a2)
-movq %rax, %rbx              # Store result in rbx (q)
+  # 1. Check if the difference series is arithmetic
+  # Calculate d1 = a3 + a1 - 2 * a2
+  movl %r15d, %eax             # eax = a3
+  addl %r13d, %eax             # eax = a3 + a1
+  movl %r14d, %edx             # edx = a2
+  shll $1, %edx                # edx = 2 * a2
+  subl %edx, %eax              # eax = a3 + a1 - 2 * a2
+  movl %eax, %r12d             # r12d = d1
 
-# Calculate d = -2 * a2 + a1 + a3
-movq %r14, %rdx              # Move a2 into rdx
-shlq $1, %rdx                 # Multiply by 2
-negq %rdx                     # Negate to get -2 * a2
-addq %r13, %rdx              # Add a1
-addq %r15, %rdx              # Add a3
-movq %rdx, %rax              # Store result in rax (d)
+  # Loop to check if the difference series is arithmetic
+  movl $2, %ebx                # index = 2
+check_arithmetic_diff:
+  cmpl %ecx, %ebx              # Compare index with size
+  jge check_geometric_diff
 
+  # Load series[i+1], series[i], series[i-1]
+  movl series(,%ebx,4), %r9d   # r9d = series[i]
+  movl series+4(,%ebx,4), %r10d # r10d = series[i+1]
+  movl series-4(,%ebx,4), %r11d # r11d = series[i-1]
 
-  # Initialize boolean flags in registers
-  movb $1, %r9b                # arithmetic_diff
-  movb $1, %r10b               # geometric_diff
-  movb $1, %r11b               # arithmetic_quot
-  movb $1, %r12b               # geometric_quot
+  # Calculate A(i+1) + A(i-1) - 2 * A(i)
+  movl %r10d, %eax             # eax = A(i+1)
+  addl %r11d, %eax             # eax = A(i+1) + A(i-1)
+  movl %r9d, %edx              # edx = A(i)
+  shll $1, %edx                # edx = 2 * A(i)
+  subl %edx, %eax              # eax = A(i+1) + A(i-1) - 2 * A(i)
 
-  # Check subsequent elements
-  movq $3, %r8                 # Start from a4
-check_loop:
-  cmpq %rcx, %r8                # Compare with size
-  jge finish_check              # If i >= size, finish checking
+  # Compare with d1
+  cmpl %r12d, %eax
+  jne check_geometric_diff     # If not equal, check geometric difference
 
-  # Decrement index for previous element
-  decq %r8
-  movq series(, %r8, 8), %rsi   # Load series[i-1]
-  incq %r8                       # Increment back for current index
-  movq series(, %r8, 8), %rdi    # Load series[i]
-
-  # Check differences for arithmetic and geometric
-  subq %rsi, %rdi               # ai - a(i-1)
-  cmp %rdx, %rax                # Compare with d
-  jne check_arithmetic_diff_false
-  jmp check_geometric_diff
-
-check_arithmetic_diff_false:
-  movb $0, %r9b                  # Set arithmetic_diff to false
-
-check_geometric_diff:
-  # Perform geometric check
-  movq %rsi, %rdi                # ai / a(i-1)
-  imulq %rsi                     # ai / a(i-1)
-  cmp %rbx, %rdx                # Compare with q
-  jne check_geometric_diff_false
-  jmp next_iteration
-
-check_geometric_diff_false:
-  movb $0, %r10b                 # Set geometric_quot to false
-
-next_iteration:
-  incq %r8                       # Increment index i
-  jmp check_loop                # Repeat for next element
-
-finish_check:
-  # Check if any flag is true
-  movb $0, seconddegree         # Default to 0
-  or %r9b, seconddegree         # Check arithmetic_diff
-  or %r10b, seconddegree        # Check geometric_diff
-  or %r11b, seconddegree        # Check arithmetic_quot
-  or %r12b, seconddegree        # Check geometric_quot
+  incl %ebx                    # Increment index
+  jmp check_arithmetic_diff
 
 return_true:
-  movb $1, seconddegree         # Set seconddegree to 1 if size < 3
-  jmp end                       # Exit
+  movl $1, result
+  jmp end
+
+# 2. Check if the difference series is geometric
+check_geometric_diff:
+  # Calculate q1 = (a3 - a2) / (a2 - a1)
+  movl %r15d, %eax             # eax = a3
+  subl %r14d, %eax             # eax = a3 - a2
+  movl %r14d, %edx             # edx = a2
+  subl %r13d, %edx             # edx = a2 - a1
+  idivl %edx                   # eax = q1
+
+  movl %eax, %r12d             # r12d = q1
+
+  # Loop to check if the difference series is geometric
+  movl $2, %ebx                # index = 2
+check_geometric_diff_loop:
+  cmpl %ecx, %ebx              # Compare index with size
+  jge check_arithmetic_quot
+
+  # Load series[i+1], series[i], series[i-1]
+  movl series(,%ebx,4), %r9d   # r9d = series[i]
+  movl series+4(,%ebx,4), %r10d # r10d = series[i+1]
+  movl series-4(,%ebx,4), %r11d # r11d = series[i-1]
+
+  # Calculate (A(i+1) - A(i)) / (A(i) - A(i-1))
+  movl %r10d, %eax             # eax = A(i+1)
+  subl %r9d, %eax              # eax = A(i+1) - A(i)
+  movl %r9d, %edx              # edx = A(i)
+  subl %r11d, %edx             # edx = A(i) - A(i-1)
+  idivl %edx                   # eax = (A(i+1) - A(i)) / (A(i) - A(i-1))
+
+  # Compare with q1
+  cmpl %r12d, %eax
+  jne check_arithmetic_quot    # If not equal, check arithmetic quotient
+
+  incl %ebx                    # Increment index
+  jmp check_geometric_diff_loop
+
+# 3. Check if the quotient series is arithmetic
+check_arithmetic_quot:
+  # Calculate d2 = a3 / a2 - a2 / a1
+  movl %r15d, %eax             # eax = a3
+  idivl %r14d                  # eax = a3 / a2
+  movl %eax, %r12d             # r12d = a3 / a2
+
+  movl %r14d, %eax             # eax = a2
+  idivl %r13d                  # eax = a2 / a1
+  subl %eax, %r12d             # r12d = a3 / a2 - a2 / a1
+
+  # Loop to check if the quotient series is arithmetic
+  movl $2, %ebx                # index = 2
+check_arithmetic_quot_loop:
+  cmpl %ecx, %ebx              # Compare index with size
+  jge check_geometric_quot
+
+  # Load series[i+1], series[i], series[i-1]
+  movl series(,%ebx,4), %r9d   # r9d = series[i]
+  movl series+4(,%ebx,4), %r10d # r10d = series[i+1]
+  movl series-4(,%ebx,4), %r11d # r11d = series[i-1]
+
+  # Calculate A(i+1) / A(i) - A(i) / A(i-1)
+  movl %r10d, %eax             # eax = A(i+1)
+  idivl %r9d                   # eax = A(i+1) / A(i)
+  movl %eax, %r8d              # r8d = A(i+1) / A(i)
+
+  movl %r9d, %eax              # eax = A(i)
+  idivl %r11d                  # eax = A(i) / A(i-1)
+  subl %eax, %r8d              # r8d = A(i+1) / A(i) - A(i) / A(i-1)
+
+  # Compare with d2
+  cmpl %r12d, %r8d
+  jne check_geometric_quot     # If not equal, check geometric quotient
+
+  incl %ebx                    # Increment index
+  jmp check_arithmetic_quot_loop
+
+# 4. Check if the quotient series is geometric
+check_geometric_quot:
+  # Calculate q2 = (a3 * a1) / (a2 * a2)
+  movl %r15d, %eax             # eax = a3
+  imull %r13d, %eax            # eax = a3 * a1
+  movl %r14d, %edx             # edx = a2
+  imull %edx                   # edx:eax = a3 * a1
+  idivl %edx                   # eax = (a3 * a1) / (a2 * a2)
+
+  movl %eax, %r12d             # r12d = q2
+
+  # Loop to check if the quotient series is geometric
+  movl $2, %ebx                # index = 2
+check_geometric_quot_loop:
+  cmpl %ecx, %ebx              # Compare index with size
+  jge end
+
+  # Load series[i+1], series[i], series[i-1]
+  movl series(,%ebx,4), %r9d   # r9d = series[i]
+  movl series+4(,%ebx,4), %r10d # r10d = series[i+1]
+  movl series-4(,%ebx,4), %r11d # r11d = series[i-1]
+
+  # Calculate (A(i+1) * A(i-1)) / (A(i) * A(i))
+  movl %r10d, %eax             # eax = A(i+1)
+  imull %r11d, %eax            # eax = A(i+1) * A(i-1)
+  movl %r9d, %edx              # edx = A(i)
+  imull %edx                   # edx:eax = A(i+1) * A(i-1)
+  idivl %edx                   # eax = (A(i+1) * A(i-1)) / (A(i) * A(i))
+
+  # Compare with q2
+  cmpl %r12d, %eax
+  jne end                      # If not equal, go to end
+
+  incl %ebx                    # Increment index
+  jmp check_geometric_quot_loop
 
 end:
   # Print "seconddegree="
