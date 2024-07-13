@@ -1,0 +1,28 @@
+```bash
+as -g ex5.asm ex5_test1 -o ex5_test1.o && ld -g ex5_test1.o -o ex5_test1_run && ./ex5_test1_run
+as -g ex5.asm ex5_test2 -o ex5_test2.o && ld -g ex5_test2.o -o ex5_test2_run && ./ex5_test2_run
+as -g ex5.asm ex5_test3 -o ex5_test3.o && ld -g ex5_test3.o -o ex5_test3_run && ./ex5_test3_run
+as -g ex5.asm ex5_test4 -o ex5_test4.o && ld -g ex5_test4.o -o ex5_test4_run && ./ex5_test4_run
+as -g ex5.asm ex5_test5 -o ex5_test5.o && ld -g ex5_test5.o -o ex5_test5_run && ./ex5_test5_run
+as -g ex5.asm ex5_test6 -o ex5_test6.o && ld -g ex5_test6.o -o ex5_test6_run && ./ex5_test6_run
+as -g ex5.asm ex5_test7 -o ex5_test7.o && ld -g ex5_test7.o -o ex5_test7_run && ./ex5_test7_run
+as -g ex5.asm ex5_test8 -o ex5_test8.o && ld -g ex5_test8.o -o ex5_test8_run && ./ex5_test8_run
+as -g ex5.asm ex5_test9 -o ex5_test9.o && ld -g ex5_test9.o -o ex5_test9_run && ./ex5_test9_run
+as -g ex5.asm ex5_test10 -o ex5_test10.o && ld -g ex5_test10.o -o ex5_test10_run && ./ex5_test10_run
+as -g ex5.asm ex5_test11 -o ex5_test11.o && ld -g ex5_test11.o -o ex5_test11_run && ./ex5_test11_run
+as -g ex5.asm ex5_test12 -o ex5_test12.o && ld -g ex5_test12.o -o ex5_test12_run && ./ex5_test12_run
+as -g ex5.asm ex5_test13 -o ex5_test13.o && ld -g ex5_test13.o -o ex5_test13_run && ./ex5_test13_run
+as -g ex5.asm ex5_test14 -o ex5_test14.o && ld -g ex5_test14.o -o ex5_test14_run && ./ex5_test14_run
+as -g ex5.asm ex5_test15 -o ex5_test15.o && ld -g ex5_test15.o -o ex5_test15_run && ./ex5_test15_run
+as -g ex5.asm ex5_test16 -o ex5_test16.o && ld -g ex5_test16.o -o ex5_test16_run && ./ex5_test16_run
+as -g ex5.asm ex5_test17 -o ex5_test17.o && ld -g ex5_test17.o -o ex5_test17_run && ./ex5_test17_run
+as -g ex5.asm ex5_test18 -o ex5_test18.o && ld -g ex5_test18.o -o ex5_test18_run && ./ex5_test18_run
+as -g ex5.asm ex5_test19 -o ex5_test19.o && ld -g ex5_test19.o -o ex5_test19_run && ./ex5_test19_run
+as -g ex5.asm ex5_test20 -o ex5_test20.o && ld -g ex5_test20.o -o ex5_test20_run && ./ex5_test20_run
+as -g ex5.asm ex5_test21 -o ex5_test21.o && ld -g ex5_test21.o -o ex5_test21_run && ./ex5_test21_run
+as -g ex5.asm ex5_test22 -o ex5_test22.o && ld -g ex5_test22.o -o ex5_test22_run && ./ex5_test22_run
+as -g ex5.asm ex5_test23 -o ex5_test23.o && ld -g ex5_test23.o -o ex5_test23_run && ./ex5_test23_run
+as -g ex5.asm ex5_test24 -o ex5_test24.o && ld -g ex5_test24.o -o ex5_test24_run && ./ex5_test24_run
+as -g ex5.asm ex5_test25 -o ex5_test25.o && ld -g ex5_test25.o -o ex5_test25_run && ./ex5_test25_run
+as -g ex5.asm ex5_test26 -o ex5_test26.o && ld -g ex5_test26.o -o ex5_test26_run && ./ex5_test26_run
+```
