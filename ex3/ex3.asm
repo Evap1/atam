@@ -134,7 +134,7 @@ not_leaf1_HW1:
 level1_continue_HW1:
     addq $8, %r10
     movq (%r10), %r11               # move to the next son in level 1 array
-    jmp level1
+    jmp level1_HW1
 level1_root_HW1:
     incq %r9
     jmp end_check_HW1
