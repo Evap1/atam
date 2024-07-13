@@ -133,14 +133,18 @@ check_arithmetic_quot_loop:
 # 4. Check if the quotient series is geometric
 check_geometric_quot:
   # Calculate q2 = (a3 * a1) / (a2 * a2)
-  movl %r14d, %eax             # eax = a2
-  imull %r14d, %eax            # eax = a2 * a2
-  movl %eax, %r9d
-  movl %r15d, %eax             # eax = a3
-  imull %r13d, %eax            # eax = a3 * a1
-  cdq
-  idivl %r9d                   # eax = (a3 * a1) / (a2 * a2)
-  movl %eax, %r12d             # r12d = q2
+  movslq %r12, %r12
+  movslq %r13d, %r13
+  movlsq $r14d, %r14
+  movlsq $r15d, %r15
+  movq %r14, %rax             # rax = a2
+  imulq %r14, %rax            # rax = a2 * a2
+  movq %rax, %r9
+  movq %r15, %rax             # rax = a3
+  imulq %r13, %rax            # rax = a3 * a1
+  cqo
+  idivq %r9                   # rax = (a3 * a1) / (a2 * a2)
+  movq %rax, %r12             # r12 = q2
 
   # Loop to check if the quotient series is geometric
   movl $2, %ebx                # index = 2
@@ -154,16 +158,19 @@ check_geometric_quot_loop:
   movl series-4(,%ebx,4), %r11d # r11d = series[i-1]
 
   # Calculate (A(i+1) * A(i-1)) / (A(i) * A(i))
-  movl %r9d, %eax              # eax = A(i)
-  imull %r9d, %eax             # eax = A(i) * A(i)
-  movl %eax, %r9d
-  movl %r10d, %eax             # eax = A(i+1)
-  imull %r11d, %eax            # eax = A(i+1) * A(i-1)
-  cdq
-  idivl %r9d                   # eax = (A(i+1) * A(i-1)) / (A(i) * A(i)) r9d is the devisor. it is not possible to devide by edx!
+  movslq %r9d, %r9
+  movlsq $r10d, %r10
+  movlsq $r11d, %r11
+  movq %r9, %rax              # rax = A(i)
+  imulq %r9, %rax             # rax = A(i) * A(i)
+  movq %rax, %r9
+  movq %r10, %rax             # rax = A(i+1)
+  imul1 %r11, %rax            # rax = A(i+1) * A(i-1)
+  cqo
+  idivl %r9                   # rax = (A(i+1) * A(i-1)) / (A(i) * A(i)) r9d is the devisor. it is not possible to devide by edx!
 
   # Compare with q2
-  cmpl %r12d, %eax
+  cmpq %r12, %rax
   jne end                      # If not equal, go to end
 
   incl %ebx                    # Increment index
