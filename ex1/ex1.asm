@@ -2,15 +2,15 @@
 
 .section .text
 _start:
-    movq $0, Legal
+    movb $0, Legal
     movq Adress, %r9
-    movq length, %r10
-    movq Index, %r11
-    cmpq %r10, %r11
+    movslq length, %r10
+    movslq Index, %r11
+    cmpl %r10, %r11
     jae end
-    movq $1 , Legal
+    movb $1 , Legal
     movq (%r9, %r11, 4), %r12
-    movq %r12, num
+    movl %r12, num
 end:
 
  # Print "num: "
