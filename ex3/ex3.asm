@@ -155,34 +155,3 @@ not_rich_HW1:
     movb $0, rich               # set rich to 0 if the condition is not met
 
 end:
-
-
-
-# IMPORTANT: the max depth of the tree is 6 including the root.
-
-# pseudo
-#v_counter = 0
-#leaf_counter = 0
-# node_level1 = root_array[0]
-# // Go over root sons:
-# while ( node_level1 != 0 ){
-#	node_level2_HW1 = node_level1[0]	// set the first son
-#
-#	// Go one level deeper:
-#	while (node_level2_HW1 != 0){  	// iterate over all sons	
-#		go deeper ....
-#	}
-#	if ( node_level2_HW1 == 0 ){  	// has no sons- it's a leaf
-#		leaf_counter++
-#	}
-# 	v_counter++ 			// count it self as a vertex
-#	node_level1 = displace root_array by one cell
-# }
-# v_counter++ 				// count it self as a vertex
-
-
-# each time we go down :1. Get the first son
-#			2. if it's not 0, go deeper
-#			3. If it's 0, count leaf
-#			4. Count itself as vertex
-#			5. Displace to next son
