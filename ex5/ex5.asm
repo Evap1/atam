@@ -1,13 +1,5 @@
 .global _start
 
-.section .data
-series:
-    .long 2, 6, 18  # Example series
-size:
-    .quad 3          # Size of the series
-seconddegree:
-    .byte 0          # Default value
-
 .section .text
 _start:
   movq $0, %r8                 # Initialize index i to 0
@@ -17,21 +9,21 @@ _start:
   jle return_true              # If so, return 1
 
   # Load first three elements
-  movq series, %rax            # a1
-  movq series + 8, %rbx        # a2
-  movq series + 16, %rcx       # a3
+  movq series(, %r8, 8), %rax   # a1
+  movq series(, %r8, 8), %rbx    # a2
+  movq series(, %r8, 8), %rcx    # a3
 
   # Calculate d = -2 * a2 + a1 + a3
   movq %rbx, %rdx              # Move a2 into rdx
   shlq $1, %rdx                 # Multiply by 2
-  neg %rdx                     # Negate to get -2 * a2
-  addq %rax, %rdx              # Add a1
-  addq %rcx, %rdx              # Add a3
+  negq %rdx                     # Negate to get -2 * a2
+  addq %rax, %rdx               # Add a1
+  addq %rcx, %rdx               # Add a3
 
   # Calculate q = a1 * a3 / (a2 * a2)
-  imulq %rcx, %rax              # a1 * a3
+  imulq %rax, %rcx              # a1 * a3
   imulq %rbx, %rbx              # a2 * a2
-  cqo                           # Sign-extend rax to rdx for division
+  cqto                          # Sign-extend rax to rdx for division
   idivq %rbx                    # q = a1 * a3 / (a2 * a2)
 
   # Initialize boolean flags in registers
@@ -53,7 +45,7 @@ check_loop:
 
   # Check differences for arithmetic and geometric
   subq %rsi, %rdi               # ai - a(i-1)
-  cmp %rdx, %rax                # Compare with d
+  cmpq %rdx, %rax                # Compare with d
   jne check_arithmetic_diff_false
   jmp check_geometric_diff
 
@@ -63,7 +55,7 @@ check_arithmetic_diff_false:
 check_geometric_diff:
   # Perform geometric check
   imulq %rsi                     # ai / a(i-1)
-  cmp %rcx, %rdx                # Compare with q
+  cmpq %rcx, %rdx                # Compare with q
   jne check_geometric_diff_false
   jmp next_iteration
 
@@ -101,12 +93,12 @@ end:
 
 convert_seconddegree_to_str:
   dec %rsi                     # move pointer backwards
-  movl $10, %ecx               # base 10
-  xor %edx, %edx               # clear %edx for division
-  div %ecx                     # divide %eax by 10
+  movq $10, %rcx               # base 10
+  xor %rdx, %rdx               # clear %rdx for division
+  div %rcx                     # divide %rax by 10
   addb $'0', %dl               # convert remainder to ASCII
   movb %dl, (%rsi)             # store character in buffer
-  test %eax, %eax              # check if quotient is zero
+  test %rax, %rax              # check if quotient is zero
   jnz convert_seconddegree_to_str # loop if quotient is not zero
 
   # Print the string representation of 'seconddegree'
