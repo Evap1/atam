@@ -109,3 +109,4 @@ not_science_HW1:
 
 update_type4_HW1:
     movb $4, type            # Set type to 4
+end:
