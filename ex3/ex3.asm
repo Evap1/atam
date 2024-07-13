@@ -62,7 +62,9 @@ level5_leaf:
 not_leaf5:
     incq %r8                    # increment v_counter for level 5 node
 level5_continue:
-    movq 8(%r15), %r15               # move to the next son in level 5 array
+    addq $8, %r14
+    movq (%r14), %r15               # move to the next son
+    #movq 8(%r15), %r15               # move to the next son in level 5 array
     jmp level5
 level5_end:
     cmpq $0, %r14
@@ -75,7 +77,9 @@ level4_leaf:
 not_leaf4:
     incq %r8                    # increment v_counter for level 4 node
 level4_continue:
-    movq 8(%r14), %r14               # move to the next son in level 4 array
+    addq $8, %r13
+    movq (%r13), %r14               # move to the next son
+    #movq 8(%r14), %r14               # move to the next son in level 4 array
     jmp level4
 level4_end:
     cmpq $0, %r13
@@ -88,7 +92,9 @@ level3_leaf:
 not_leaf3:
     incq %r8                    # increment v_counter for level 3 node
 level3_continue:
-    movq 8(%r13), %r13               # move to the next son in level 3 array
+    addq $8, %r12
+    movq (%r12), %r13               # move to the next son
+    #movq 8(%r13), %r13               # move to the next son in level 3 array
     jmp level3
 level3_end:
     cmpq $0, %r12
@@ -101,7 +107,9 @@ level2_leaf:
 not_leaf2:
     incq %r8                    # increment v_counter for level 2 node
 level2_continue:
-    movq 8(%r12), %r12               # move to the next son in level 2 array
+    addq $8, %r11
+    movq (%r11), %r12               # move to the next son
+    #movq 8(%r12), %r12               # move to the next son in level 2 array
     jmp level2
 level2_end:			
     cmpq $0, %r11		# if not equal then not leaf and no need to count as leaf
