@@ -9,10 +9,11 @@ _start:
   cmpq $3, %rcx                # Check if size < 3
   jle return_true              # If so, return 1
 
-  # Load first three elements
-movq series, %r13            # a1
-movq series + 8, %r14        # a2
-movq series + 16, %r15       # a3
+# Load first three elements
+movq series(0), %r13        # a1
+movq series(8), %r14        # a2
+movq series(16), %r15       # a3
+
 
 # Calculate q = a1 * a3 / (a2 * a2)
 imulq %r15, %r13             # a1 * a3
