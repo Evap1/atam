@@ -5,7 +5,7 @@ _start:
     movq $0, %r8 		# vertex_counter = 0
     movq $0, %r9 		# leaf_counter = 0
     leaq root, %r10 	# node_level1 = root_array[0]
-    movb $0 , rich
+    movq $0 , rich      # cleaning rich label
 
     # start traversal from root
     movq (%r10), %r11           # load the first son of the root
@@ -135,6 +135,7 @@ level1_end:
 
 end_check:
     # Check if leaf_counter / (v_counter - leaf_counter) <= 3
+    addq %r9, %r8               # any leaf is a vertex also
     imulq $3, %r9               # leaf_counter * 3
     cmpq %r8, %r9               # compare (leaf_counter * 3) with (v_counter - leaf_counter)
     jb not_rich
