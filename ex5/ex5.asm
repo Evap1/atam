@@ -1,9 +1,5 @@
 .global _start
 
-.section .data
-series: .int 2, 6, 18, 54, 162, 486
-size: .int 6
-seconddegree: .int 0
 
 .section .text
 _start:
