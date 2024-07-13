@@ -91,11 +91,13 @@ check_geometric_diff_loop:
 # 3. Check if the quotient series is arithmetic
 check_arithmetic_quot:
   # Calculate d2 = a3 / a2 - a2 / a1
-  movl %r15d, %eax             # eax = a3
+  movl %r15d, %eax             # eax = a3 eax is the divedend.
+  cdq                          # sign extansion
   idivl %r14d                  # eax = a3 / a2
   movl %eax, %r12d             # r12d = a3 / a2
 
-  movl %r14d, %eax             # eax = a2
+  movl %r14d, %eax             # eax = a2 eax is the divedend.
+  cdq                          # sign extansion
   idivl %r13d                  # eax = a2 / a1
   subl %eax, %r12d             # r12d = a3 / a2 - a2 / a1
 
@@ -111,11 +113,13 @@ check_arithmetic_quot_loop:
   movl series-4(,%ebx,4), %r11d # r11d = series[i-1]
 
   # Calculate A(i+1) / A(i) - A(i) / A(i-1)
-  movl %r10d, %eax             # eax = A(i+1)
+  movl %r10d, %eax             # eax = A(i+1) eax is the divedend.
+  cdq                          # sign extansion
   idivl %r9d                   # eax = A(i+1) / A(i)
   movl %eax, %r8d              # r8d = A(i+1) / A(i)
 
-  movl %r9d, %eax              # eax = A(i)
+  movl %r9d, %eax              # eax = A(i) eax is the divedend.
+  cdq                          # sign extansion
   idivl %r11d                  # eax = A(i) / A(i-1)
   subl %eax, %r8d              # r8d = A(i+1) / A(i) - A(i) / A(i-1)
 
