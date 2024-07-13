@@ -36,3 +36,8 @@ movq $1, %rdi                # file descriptor (stdout)
 lea newline(%rip), %rsi      # address of newline character
 movq $1, %rdx                # number of bytes to write
 syscall                      # print newline
+
+# Exit the program
+movq $60, %rax               # syscall number for sys_exit
+xor %rdi, %rdi               # exit status (0 for success)
+syscall
