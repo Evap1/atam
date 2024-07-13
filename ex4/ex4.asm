@@ -40,7 +40,7 @@ left_goes_down:
     movl 8(%r12), %eax          # Load prev->data
     movl 8(%r13), %ebx          # Load prev of prev->data
     cmp %eax, %ebx
-    jle not_monotonic           # If the data is not decreasing, it's not monotonic
+    jl not_monotonic           # If the data is not decreasing, it's not monotonic
     jmp left_goes_down
 
 left_goes_up:
@@ -51,11 +51,11 @@ left_goes_up:
     movl 8(%r12), %eax          # Load prev->data
     movl 8(%r13), %ebx          # Load prev of prev->data
     cmp %eax, %ebx
-    jge not_monotonic           # If the data is not increasing, it's not monotonic
+    jg not_monotonic           # If the data is not increasing, it's not monotonic
     jmp left_goes_up
 
 
-    right_check:
+right_check:
     movq 12(%r10), %r12         # Load next pointer
     cmpq $0, %r12               # Check if next is nullptr
     je increment_result         # If so, skip right
@@ -84,7 +84,7 @@ right_goes_down:
     movl 8(%r12), %eax          # Load next->data
     movl 8(%r13), %ebx          # Load next of next->data
     cmp %eax, %ebx
-    jle not_monotonic           # If the data is not decreasing, it's not monotonic
+    jl not_monotonic           # If the data is not decreasing, it's not monotonic
     jmp right_goes_down
 
 right_goes_up:
@@ -95,7 +95,7 @@ right_goes_up:
     movl 8(%r12), %eax          # Load next->data
     movl 8(%r13), %ebx          # Load next of next->data
     cmp %eax, %ebx
-    jge not_monotonic           # If the data is not increasing, it's not monotonic
+    jg not_monotonic           # If the data is not increasing, it's not monotonic
     jmp right_goes_up
 
 increment_result:
