@@ -3,21 +3,20 @@
 
 .section .text
 _start:
-  # Load the size of the series
-  movl size, %ecx              # %ecx holds the size of the series
+  movl size, %ecx              
   subl $1, %ecx
 
-  # Check if size -1 < 3-1, if so, set seconddegree to 1 and exit
+  # check if size -1 < 3-1, if so, set seconddegree to 1 and exit
   cmpl $2, %ecx
-  jl return_true
+  jl update_seconddegree_HW1
 
-  # Load the first three elements
+  # load the first three elements
   movl series, %r13d           # a1
   movl series + 4, %r14d       # a2
   movl series + 8, %r15d       # a3
 
-  # 1. Check if the difference series is arithmetic
-  # Calculate d1 = a3 + a1 - 2 * a2
+  # 1. check if the difference series is arithmetic
+  # calculate d1 = a3 + a1 - 2 * a2
   movl %r15d, %eax             # eax = a3
   addl %r13d, %eax             # eax = a3 + a1
   movl %r14d, %edx             # edx = a2
@@ -25,33 +24,32 @@ _start:
   subl %edx, %eax              # eax = a3 + a1 - 2 * a2
   movl %eax, %r12d             # r12d = d1
 
-  # Loop to check if the difference series is arithmetic
+  # loop to check if the difference series is arithmetic
   movl $2, %ebx                # index = 2
-check_arithmetic_diff:
-  cmpl %ecx, %ebx              # Compare index with size
-  jge return_true              # If index >= size, return true
+check_arithmetic_diff_HW1:
+  cmpl %ecx, %ebx              # compare index with size
+  jge update_seconddegree_HW1              # If index >= size, return true
 
-  # Load series[i+1], series[i], series[i-1]
   movl series(,%ebx,4), %r9d   # r9d = series[i]
   movl series+4(,%ebx,4), %r10d # r10d = series[i+1]
   movl series-4(,%ebx,4), %r11d # r11d = series[i-1]
 
-  # Calculate A(i+1) + A(i-1) - 2 * A(i)
+  # calculate A(i+1) + A(i-1) - 2 * A(i)
   movl %r10d, %eax             # eax = A(i+1)
   addl %r11d, %eax             # eax = A(i+1) + A(i-1)
   movl %r9d, %edx              # edx = A(i)
   shll $1, %edx                # edx = 2 * A(i)
   subl %edx, %eax              # eax = A(i+1) + A(i-1) - 2 * A(i)
 
-  # Compare with d1
+  # compare with d1
   cmpl %r12d, %eax
-  jne check_geometric_diff     # If not equal, check geometric difference
+  jne check_geometric_diff_HW1     # if not equal, check geometric difference
 
-  incl %ebx                    # Increment index
-  jmp check_arithmetic_diff
+  incl %ebx                   
+  jmp check_arithmetic_diff_HW1
 
-# 2. Check if the difference series is geometric
-check_geometric_diff:
+# 2. check if the difference series is geometric
+check_geometric_diff_HW1:
   # Calculate q1 = (a3 - a2) / (a2 - a1)
   movl %r15d, %eax             # eax = a3
   subl %r14d, %eax             # eax = a3 - a2 eax is the divedend
@@ -62,18 +60,17 @@ check_geometric_diff:
 
   movl %eax, %r12d             # r12d = q1
 
-  # Loop to check if the difference series is geometric
-  movl $2, %ebx                # index = 2
-check_geometric_diff_loop:
-  cmpl %ecx, %ebx              # Compare index with size
-  jge return_true              # If index >= size, return true
+  # loop to check if the difference series is geometric
+  movl $2, %ebx                
+check_geometric_diff_loop_HW1:
+  cmpl %ecx, %ebx              # compare index with size
+  jge update_seconddegree_HW1              # if index >= size, return true
 
-  # Load series[i+1], series[i], series[i-1]
   movl series(,%ebx,4), %r9d   # r9d = series[i]
   movl series+4(,%ebx,4), %r10d # r10d = series[i+1]
   movl series-4(,%ebx,4), %r11d # r11d = series[i-1]
 
-  # Calculate (A(i+1) - A(i)) / (A(i) - A(i-1))
+  # calculate (A(i+1) - A(i)) / (A(i) - A(i-1))
   movl %r10d, %eax             # eax = A(i+1)
   subl %r9d, %eax              # eax = A(i+1) - A(i) eax is the divedend
   cdq                          # sign extansion
@@ -81,15 +78,15 @@ check_geometric_diff_loop:
   subl %r11d, %r9d             # edx = A(i) - A(i-1) r9d is the devisor. it is not possible to devide by edx!
   idivl %r9d                   # eax = (A(i+1) - A(i)) / (A(i) - A(i-1))
 
-  # Compare with q1
+  # compare with q1
   cmpl %r12d, %eax
-  jne check_arithmetic_quot    # If not equal, check arithmetic quotient
+  jne check_arithmetic_quot_HW1    # if not equal, check arithmetic quotient
 
-  incl %ebx                    # Increment index
-  jmp check_geometric_diff_loop
+  incl %ebx                   
+  jmp check_geometric_diff_loop_HW1
 
-# 3. Check if the quotient series is arithmetic
-check_arithmetic_quot:
+# 3. check if the quotient series is arithmetic
+check_arithmetic_quot_HW1:
   # Calculate d2 = a3 / a2 - a2 / a1
   movl %r15d, %eax             # eax = a3 eax is the divedend.
   cdq                          # sign extansion
@@ -101,18 +98,17 @@ check_arithmetic_quot:
   idivl %r13d                  # eax = a2 / a1
   subl %eax, %r12d             # r12d = a3 / a2 - a2 / a1
 
-  # Loop to check if the quotient series is arithmetic
+  # check if the quotient series is arithmetic
   movl $2, %ebx                # index = 2
-check_arithmetic_quot_loop:
-  cmpl %ecx, %ebx              # Compare index with size
-  jge return_true              # If index >= size, return true
+check_arithmetic_quot_loop_HW1:
+  cmpl %ecx, %ebx              # compare index with size
+  jge update_seconddegree_HW1              # if index >= size, return true
 
-  # Load series[i+1], series[i], series[i-1]
   movl series(,%ebx,4), %r9d   # r9d = series[i]
   movl series+4(,%ebx,4), %r10d # r10d = series[i+1]
   movl series-4(,%ebx,4), %r11d # r11d = series[i-1]
 
-  # Calculate A(i+1) / A(i) - A(i) / A(i-1)
+  # calculate A(i+1) / A(i) - A(i) / A(i-1)
   movl %r10d, %eax             # eax = A(i+1) eax is the divedend.
   cdq                          # sign extansion
   idivl %r9d                   # eax = A(i+1) / A(i)
@@ -125,13 +121,13 @@ check_arithmetic_quot_loop:
 
   # Compare with d2
   cmpl %r12d, %r8d
-  jne check_geometric_quot     # If not equal, check geometric quotient
+  jne check_geometric_quot_HW1     # if not equal, check geometric quotient
 
-  incl %ebx                    # Increment index
-  jmp check_arithmetic_quot_loop
+  incl %ebx                   
+  jmp check_arithmetic_quot_loop_HW1
 
-# 4. Check if the quotient series is geometric
-check_geometric_quot:
+# 4. check if the quotient series is geometric
+check_geometric_quot_HW1:
   # Calculate q2 = (a3 * a1) / (a2 * a2)
   movslq %r12d, %r12
   movslq %r13d, %r13
@@ -146,18 +142,17 @@ check_geometric_quot:
   idivq %r9                   # rax = (a3 * a1) / (a2 * a2)
   movq %rax, %r12             # r12 = q2
 
-  # Loop to check if the quotient series is geometric
-  movl $2, %ebx                # index = 2
-check_geometric_quot_loop:
-  cmpl %ecx, %ebx              # Compare index with size
-  jge return_true              # If index >= size, return true
+  # check if the quotient series is geometric
+  movl $2, %ebx                
+check_geometric_quot_loop_HW1:
+  cmpl %ecx, %ebx              # compare index with size
+  jge update_seconddegree_HW1              # if index >= size, return true
 
-  # Load series[i+1], series[i], series[i-1]
   movl series(,%ebx,4), %r9d   # r9d = series[i]
   movl series+4(,%ebx,4), %r10d # r10d = series[i+1]
   movl series-4(,%ebx,4), %r11d # r11d = series[i-1]
 
-  # Calculate (A(i+1) * A(i-1)) / (A(i) * A(i))
+  # calculate (A(i+1) * A(i-1)) / (A(i) * A(i))
   movslq %r9d, %r9
   movslq %r10d, %r10
   movslq %r11d, %r11
@@ -171,12 +166,12 @@ check_geometric_quot_loop:
 
   # Compare with q2
   cmpq %r12, %rax
-  jne end                      # If not equal, go to end
+  jne end                      # if not equal, go to end
 
-  incl %ebx                    # Increment index
-  jmp check_geometric_quot_loop
+  incl %ebx                   
+  jmp check_geometric_quot_loop_HW1
 
-return_true:
+update_seconddegree_HW1:
   movl $1, seconddegree
 
 end:
