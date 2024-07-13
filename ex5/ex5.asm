@@ -133,12 +133,13 @@ check_arithmetic_quot_loop:
 # 4. Check if the quotient series is geometric
 check_geometric_quot:
   # Calculate q2 = (a3 * a1) / (a2 * a2)
+  movl %r14d, %eax             # eax = a2
+  imull %r14d, %eax            # eax = a2 * a2
+  movl %eax, %r9d
   movl %r15d, %eax             # eax = a3
   imull %r13d, %eax            # eax = a3 * a1
-  movl %r14d, %edx             # edx = a2
-  imull %edx                   # edx:eax = a3 * a1
-  idivl %edx                   # eax = (a3 * a1) / (a2 * a2)
-
+  cdq
+  idivl %r9d                   # eax = (a3 * a1) / (a2 * a2)
   movl %eax, %r12d             # r12d = q2
 
   # Loop to check if the quotient series is geometric
