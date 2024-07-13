@@ -10,7 +10,7 @@ _start:
   jle return_true              # If so, return 1
 
 # Load first three elements
-leaq series(%rip), %r10   # Load the address of series into %r10
+leaq series, %r10   # Load the address of series into %r10
 movl 0(%r10), %r13d       # Load the first element (a1) into %r13d
 movl 4(%r10), %r14d       # Load the second element (a2) into %r14d
 movl 8(%r10), %r15d       # Load the third element (a3) into %r15d
