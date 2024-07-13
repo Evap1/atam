@@ -133,7 +133,7 @@ check_arithmetic_quot_loop:
 # 4. Check if the quotient series is geometric
 check_geometric_quot:
   # Calculate q2 = (a3 * a1) / (a2 * a2)
-  movslq %r12, %r12
+  movslq %r12d, %r12
   movslq %r13d, %r13
   movslq $r14d, %r14
   movslq $r15d, %r15
@@ -165,9 +165,9 @@ check_geometric_quot_loop:
   imulq %r9, %rax             # rax = A(i) * A(i)
   movq %rax, %r9
   movq %r10, %rax             # rax = A(i+1)
-  imul1 %r11, %rax            # rax = A(i+1) * A(i-1)
+  imulq %r11, %rax            # rax = A(i+1) * A(i-1)
   cqo
-  idivl %r9                   # rax = (A(i+1) * A(i-1)) / (A(i) * A(i)) r9d is the devisor. it is not possible to devide by edx!
+  idivq %r9                   # rax = (A(i+1) * A(i-1)) / (A(i) * A(i)) r9d is the devisor. it is not possible to devide by edx!
 
   # Compare with q2
   cmpq %r12, %rax
