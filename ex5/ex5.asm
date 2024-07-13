@@ -10,9 +10,9 @@ _start:
   jle return_true              # If so, return 1
 
 # Load first three elements
-movq series(0), %r13        # a1
-movq series(8), %r14        # a2
-movq series(16), %r15       # a3
+  movl series, %r13d           # a1
+  movl series + 4, %r14d       # a2
+  movl series + 8, %r15d       # a3
 
 
 # Calculate q = a1 * a3 / (a2 * a2)
