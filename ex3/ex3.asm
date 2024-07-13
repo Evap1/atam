@@ -5,7 +5,7 @@ _start:
     movq $0, %r8 		# vertex_counter = 0
     movq $0, %r9 		# leaf_counter = 0
     leaq root, %r10 	# node_level1 = root_array[0]
-    movq $0 , rich      # cleaning rich label
+    movb $0 , rich      
 
     # start traversal from root
     movq (%r10), %r11           # load the first son of the root
@@ -55,9 +55,11 @@ level6_end:
     cmpq $0, %r15
     jne not_leaf5
     incq %r9                    # increment leaf_counter if level 5 node is a leaf
+    incq %r8                    # any leaf is a vertex also
     jmp level5_continue
 level5_leaf:
     incq %r9                    # increment leaf_counter if level 5 node is a leaf
+    incq %r8                    # any leaf is a vertex also
     jmp level5_continue
 not_leaf5:
     incq %r8                    # increment v_counter for level 5 node
@@ -70,9 +72,11 @@ level5_end:
     cmpq $0, %r14
     jne not_leaf4
     incq %r9                    # increment leaf_counter if level 4 node is a leaf
+    incq %r8                    # any leaf is a vertex also
     jmp level4_continue
 level4_leaf:
     incq %r9                    # increment leaf_counter if level 4 node is a leaf
+    incq %r8                    # any leaf is a vertex also
     jmp level4_continue
 not_leaf4:
     incq %r8                    # increment v_counter for level 4 node
@@ -85,9 +89,11 @@ level4_end:
     cmpq $0, %r13
     jne not_leaf3
     incq %r9                    # increment leaf_counter if level 3 node is a leaf
+    incq %r8                    # any leaf is a vertex also
     jmp level3_continue
 level3_leaf:
     incq %r9                    # increment leaf_counter if level 3 node is a leaf
+    incq %r8                    # any leaf is a vertex also
     jmp level3_continue
 not_leaf3:
     incq %r8                    # increment v_counter for level 3 node
@@ -100,9 +106,11 @@ level3_end:
     cmpq $0, %r12
     jne not_leaf2
     incq %r9                    # increment leaf_counter if level 2 node is a leaf
+    incq %r8                    # any leaf is a vertex also
     jmp level2_continue
 level2_leaf:
     incq %r9                    # increment leaf_counter if level 2 node is a leaf
+    incq %r8                    # any leaf is a vertex also
     jmp level2_continue
 not_leaf2:
     incq %r8                    # increment v_counter for level 2 node
@@ -115,9 +123,11 @@ level2_end:
     cmpq $0, %r11		# if not equal then not leaf and no need to count as leaf
     jne not_leaf1
     incq %r9                    # increment leaf_counter if level 1 node is a leaf
+    incq %r8                    # any leaf is a vertex also
     jmp level1_continue
 level1_leaf:
     incq %r9                    # increment leaf_counter if level 1 node is a leaf
+    incq %r8                    # any leaf is a vertex also
     jmp level2_continue
 not_leaf1:
     incq %r8                    # increment v_counter for level 1 node
@@ -135,7 +145,7 @@ level1_end:
 
 end_check:
     # Check if leaf_counter / (v_counter - leaf_counter) <= 3
-    addq %r9, %r8               # any leaf is a vertex also
+    incq %r8                    # any leaf is a vertex also
     imulq $3, %r9               # leaf_counter * 3
     cmpq %r8, %r9               # compare (leaf_counter * 3) with (v_counter - leaf_counter)
     jb not_rich
