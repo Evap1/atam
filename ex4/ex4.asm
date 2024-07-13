@@ -29,7 +29,6 @@ inner_left_check:
     # Find the first non-null and not equal elements
     cmp %eax, %ebx
     je continue_check_left
-    cmp %eax, %ebx
     jg set_left_down
     jl set_left_up
 
@@ -47,7 +46,7 @@ continue_check_left:
     jmp check_left_tendency
 
 check_left_tendency:
-    movq 0(%r13), %r12          # Load prev pointer
+    movq 0(%r12), %r12          # Load prev pointer
     cmpq $0, %r12               # Check if prev is nullptr
     je right_check              # If so, skip left
 
@@ -82,7 +81,6 @@ inner_right_check:
     # Find the first non-null and not equal elements
     cmp %eax, %ebx
     je continue_check_right
-    cmp %eax, %ebx
     jg set_right_down
     jl set_right_up
 
@@ -100,7 +98,7 @@ continue_check_right:
     jmp check_right_tendency
 
 check_right_tendency:
-    movq 12(%r13), %r12         # Load next pointer
+    movq 12(%r12), %r12         # Load next pointer
     cmpq $0, %r12               # Check if next is nullptr
     je increment_result          # If so, skip right
 
