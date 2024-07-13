@@ -18,11 +18,11 @@ _start:
     imull %ebx, %ebx               # a2 * a2
     idivl %ebx                     # q = a1 * a3 / (a2 * a2)
 
-    # Initialize boolean flags
-    movb $1, arithmetic_diff
-    movb $1, geometric_diff
-    movb $1, arithmetic_quot
-    movb $1, geometric_quot
+    # Initialize boolean flags in registers
+    movb $1, %bl                 # arithmetic_diff
+    movb $1, %bh                 # geometric_diff
+    movb $1, %r10b               # arithmetic_quot
+    movb $1, %r11b               # geometric_quot
 
     # Check subsequent elements
     movq $3, %r8                 # Start from a4
@@ -43,7 +43,7 @@ check_loop:
     jmp check_geometric_diff
 
 check_arithmetic_diff_false:
-    movb $0, arithmetic_diff       # Set to false if not matching
+    movb $0, %bl                  # Set arithmetic_diff to false
 
 check_geometric_diff:
     # Perform geometric check
@@ -53,7 +53,7 @@ check_geometric_diff:
     jmp next_iteration
 
 check_geometric_diff_false:
-    movb $0, geometric_quot       # Set to false if not matching
+    movb $0, %bh                  # Set geometric_quot to false
 
 next_iteration:
     incq %r8                       # Increment index i
@@ -61,20 +61,17 @@ next_iteration:
 
 finish_check:
     # Check final flags and set result
-    movb arithmetic_diff, %al
-    testb %al, %al
+    testb %bl, %bl
     jz not_arithmetic
 
-    movb geometric_diff, %al
-    testb %al, %al
+    testb %bh, %bh
     jz not_geometric
 
     movl $1, result               # Set result to 1
     jmp end
 
 not_arithmetic:
-    movb geometric_diff, %al
-    testb %al, %al
+    testb %bh, %bh
     jz not_geometric
 
     movl $1, result               # Set result to 1
@@ -123,9 +120,6 @@ convert_seconddegree_to_str:
     lea newline(%rip), %rsi      # address of newline character
     movq $1, %rdx                # number of bytes to write (1 byte for newline)
     syscall                      # make the syscall to print newline
-
-    # Exit the program
-    # (Removed as requested)
 
 .section .rodata
 seconddegree_label:
