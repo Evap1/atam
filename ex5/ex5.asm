@@ -64,50 +64,22 @@ check_geometric_diff_false:
 next_iteration:
     incq %r8                       # Increment index i
 
-    # Check if all flags are false
-    movb $0, %al                  # Initialize result to 0
-    or %bl, %al                   # Check arithmetic_diff
-    or %bh, %al                   # Check geometric_diff
-    or %r10b, %al                 # Check arithmetic_quot
-    or %r11b, %al                 # Check geometric_quot
-
-    testb %al, %al                # Check if any flag is true
-    jz return_zero                # If all are false, return 0
-
     jmp check_loop                # Repeat for next element
 
-return_zero:
-    movb $0, seconddegree         # Set seconddegree to 0
-    jmp end                       # Exit loop
-
 finish_check:
-    # Combine boolean flags
-    movb $1, seconddegree         # Set default to 1
+    # Check if any flag is true
+    movb $0, seconddegree         # Default to 0
+    or %bl, seconddegree          # Check arithmetic_diff
+    or %bh, seconddegree          # Check geometric_diff
+    or %r10b, seconddegree        # Check arithmetic_quot
+    or %r11b, seconddegree        # Check geometric_quot
 
-    # Check arithmetic_diff
-    testb %bl, %bl
-    jz clear_seconddegree          # If false, clear result
-
-    # Check geometric_diff
-    testb %bh, %bh
-    jz clear_seconddegree          # If false, clear result
-
-    # Check arithmetic_quot
-    testb %r10b, %r10b
-    jz clear_seconddegree          # If false, clear result
-
-    # Check geometric_quot
-    testb %r11b, %r11b
-    jz clear_seconddegree          # If false, clear result
-
-    jmp end                       # If all true, continue
-
-clear_seconddegree:
-    movb $0, seconddegree         # Set seconddegree to 0
+return_true:
+    movb $1, seconddegree         # Set seconddegree to 1 if size < 3
+    jmp end                       # Exit
 
 end:
-
-# Print "seconddegree="
+    # Print "seconddegree="
     movq $1, %rax                # syscall number for sys_write
     movq $1, %rdi                # file descriptor (stdout)
     lea seconddegree_label(%rip), %rsi  # address of seconddegree_label
