@@ -12,17 +12,23 @@ _start:
     movl series + 4, %ebx        # a2
     movl series + 8, %ecx        # a3
 
-    # Calculate d and q
-    lea -2 * %ebx + %eax + %ecx, %edx   # d = -2*a2 + a1 + a3
-    imull %eax, %eax               # a1 * a3
-    imull %ebx, %ebx               # a2 * a2
+    # Calculate d = -2 * a2 + a1 + a3
+    movl %ebx, %edx              # Move a2 into edx
+    shll $1, %edx                 # Multiply by 2 (shift left)
+    negl %edx                     # Negate to get -2 * a2
+    addl %eax, %edx              # Add a1
+    addl %ecx, %edx              # Add a3
+
+    # Calculate q = a1 * a3 / (a2 * a2)
+    imull %eax, %eax              # a1 * a3
+    imull %ebx, %ebx              # a2 * a2
     idivl %ebx                     # q = a1 * a3 / (a2 * a2)
 
     # Initialize boolean flags in registers
-    movb $1, %bl                 # arithmetic_diff
-    movb $1, %bh                 # geometric_diff
-    movb $1, %r10b               # arithmetic_quot
-    movb $1, %r11b               # geometric_quot
+    movb $1, %bl                  # arithmetic_diff
+    movb $1, %bh                  # geometric_diff
+    movb $1, %r10b                # arithmetic_quot
+    movb $1, %r11b                # geometric_quot
 
     # Check subsequent elements
     movq $3, %r8                 # Start from a4
