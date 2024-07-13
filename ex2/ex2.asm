@@ -11,7 +11,7 @@ _start:
     testq %r9, %r9           # Update ZF based on r9
     jne update_type1_HW1            # if not divisible jump to check simple condition
 
-loop_zeros_HW1_HW1:
+loop_zeros_HW1:
     movq $0, %r11
     movq 0(%r10, %r11, 8), %r12 # Load quad from data using base=data and iterator=R11
     testq %r12, %r12         # Check if quad value is 0
@@ -37,7 +37,7 @@ update_type1_HW1:
 loop_simple_HW1:
     movq $0, %r11            # Reset index to 0
 
-check_simple_char_HW1_HW1:
+check_simple_char_HW1:
     cmpq %r11, %r9          # Compare index with size to ensure bounds
     je end_simple_check_HW1     # Exit loop if index = size-1
  
@@ -80,7 +80,7 @@ not_simple_HW1:
 
 simple_char_HW1:
     incq %r11                # Increment index
-    jmp check_simple_char_HW1_HW1    # Loop to check next character
+    jmp check_simple_char_HW1    # Loop to check next character
 
 end_simple_check_HW1:
     cmpb $1, type            # Check if type is 1
