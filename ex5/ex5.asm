@@ -12,11 +12,11 @@ _start:
   # Load first three elements
 leaq series, %r10
 movq $0,%r13
-movl (0)%r10, %r13        # a1
+movl (0)%r10, %r13d        # a1
 movq $0,%r14
-movl (4)%r10, %r14        # a2
+movl (4)%r10, %r14d        # a2
 movq $0,%r15
-movl (8)%r10, %r15        # a3
+movl (8)%r10, %r15d        # a3
 
 
 # Calculate q = a1 * a3 / (a2 * a2)
