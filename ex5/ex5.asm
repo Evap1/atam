@@ -82,28 +82,28 @@ return_zero:
 
 finish_check:
     # Combine boolean flags
-    movb $0, %al                  # Initialize result to 0
+    movb $1, seconddegree         # Set default to 1
 
     # Check arithmetic_diff
     testb %bl, %bl
-    jnz set_result_true           # If true, set result to 1
+    jz clear_seconddegree          # If false, clear result
 
     # Check geometric_diff
     testb %bh, %bh
-    jnz set_result_true           # If true, set result to 1
+    jz clear_seconddegree          # If false, clear result
 
     # Check arithmetic_quot
     testb %r10b, %r10b
-    jnz set_result_true           # If true, set result to 1
+    jz clear_seconddegree          # If false, clear result
 
     # Check geometric_quot
     testb %r11b, %r11b
-    jnz set_result_true           # If true, set result to 1
+    jz clear_seconddegree          # If false, clear result
 
-    jmp end                       # If all false, result remains 0
+    jmp end                       # If all true, continue
 
-set_result_true:
-    movb $1, seconddegree        # Set seconddegree to 1
+clear_seconddegree:
+    movb $0, seconddegree         # Set seconddegree to 0
 
 end:
 
@@ -115,7 +115,7 @@ end:
     syscall                      # make the syscall to print "seconddegree="
 
     # Convert the value of 'seconddegree' to a string
-    movzbl seconddegree(%rip), %eax  # move the value of seconddegree into %eax and zero-extend
+    movzbl seconddegree, %eax     # move the value of seconddegree into %eax
     movq $seconddegree_buf + 12, %rsi # point to the end of the buffer
     movb $0, (%rsi)              # null-terminate the string
 
