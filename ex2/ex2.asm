@@ -16,7 +16,7 @@ loop_zeros_HW1:
     movq 0(%r10, %r11, 8), %r12 
     testq %r12, %r12         # check if quad value is 0
     je update_type1_HW1
-    addq $8, %r11           
+    addq $1, %r11           
     cmpq %r11, %r13        
     jb loop_zeros_HW1        # loop if index < size
 
