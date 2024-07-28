@@ -1,0 +1,24 @@
+.global _start
+
+.section .text
+  mov $type, %rax
+  cmpl $3, (%rax)
+  jne bad_exit
+  
+  movq $60, %rax
+  movq $0, %rdi
+  syscall
+
+bad_exit:
+  movq $60, %rax
+  movq $1, %rdi
+  syscall
+
+.section .data
+data:
+    .ascii "yaya*aya$keke)ta"
+size:   # variable to store the size of string
+    .quad 16
+type:
+    .byte 5
+

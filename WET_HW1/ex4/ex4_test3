@@ -1,0 +1,73 @@
+.global _start
+
+.section .text
+
+  mov $result, %rax
+  cmpl $1, (%rax)
+  jne bad_exit
+
+  movq $60, %rax
+  movq $0, %rdi
+  syscall
+
+bad_exit:
+  movq $60, %rax
+  movq $1, %rdi
+  syscall
+
+.section .data
+Node1: 
+	.quad 0
+	.int 1
+	.quad Node2
+Node2: 
+	.quad Node1
+	.int 4
+	.quad Node3
+Node3: 
+	.quad Node2
+	.int 7
+	.quad Node4
+Node4: 
+	.quad Node3
+	.int 12
+	.quad Node5
+Node5: 
+	.quad Node4
+	.int 13
+	.quad Node6
+Node6: 
+	.quad Node5
+	.int 13
+	.quad Node7
+Node7: 
+	.quad Node6
+	.int 13
+	.quad Node8
+Node8: 
+	.quad Node7
+	.int -4
+	.quad Node9
+Node9: 
+	.quad Node8
+	.int -4
+	.quad Node10
+Node10: 
+	.quad Node9
+	.int 0
+	.quad Node11
+Node11: 
+	.quad Node10
+	.int 1
+	.quad Node12
+Node12: 
+	.quad Node11
+	.int 6
+	.quad Node13
+Node13: 
+	.quad Node12
+	.int 6
+	.quad 0
+
+nodes: .quad Node7, Node6, Node3
+result: .byte 0

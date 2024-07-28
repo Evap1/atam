@@ -1,6 +1,0 @@
-as -g ex1.asm ex1_test1 -o ex1_test1.o && ld -g ex1_test1.o -o ex1_test1_run && ./ex1_test1_run > ex1_test1.out
-as -g ex1.asm ex1_test2 -o ex1_test2.o && ld -g ex1_test2.o -o ex1_test2_run && ./ex1_test2_run > ex1_test2.out
-as -g ex1.asm ex1_test3 -o ex1_test3.o && ld -g ex1_test3.o -o ex1_test3_run && ./ex1_test3_run > ex1_test3.out
-as -g ex1.asm ex1_test4 -o ex1_test4.o && ld -g ex1_test4.o -o ex1_test4_run && ./ex1_test4_run > ex1_test4.out
-as -g ex1.asm ex1_test5 -o ex1_test5.o && ld -g ex1_test5.o -o ex1_test5_run && ./ex1_test5_run > ex1_test5.out
-as -g ex1.asm ex1_test6 -o ex1_test6.o && ld -g ex1_test6.o -o ex1_test6_run && ./ex1_test6_run > ex1_test6.out
