@@ -54,7 +54,7 @@ convert_str_num_HW3:
     movq %rdi, -64(%rbp)
 
 # pass pointer to start reading by rdi, call the function and store the return value at r10 with sign extension
-    leaq -128(rbp), %rdi
+    leaq -128(%rbp), %rdi
     call atam_atol
     movq %rax, %r10			# r10 = current number
 
