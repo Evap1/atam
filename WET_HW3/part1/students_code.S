@@ -34,7 +34,7 @@ read_loop_HW3:
 
 #  check if EOF and store indication that this is the last iteration.
     testq %rax, %rax			# rax = number of bytes read. If 0 then EOF.
-    movq %rax, -24(rbp)
+    movq %rax, -24(%rbp)
     jz convert_str_num_HW3
 
 # r8d = current read byte
@@ -48,28 +48,28 @@ read_loop_HW3:
 convert_str_num_HW3:
     movb $0, (%rsi) 
     movq %r8, -32(%rbp)
-    movq %r9, -40(rbp)
-    movq %rsi, -48(rbp)
-    movq %rdx, -56(rbp)
+    movq %r9, -40(%rbp)
+    movq %rsi, -48(%rbp)
+    movq %rdx, -56(%rbp)
     movq %rdi, -64(%rbp)
 
 # pass pointer to start reading by rdi, call the function and store the return value at r10 with sign extension
     leaq -128(rbp), %rdi
     call atam_atol
-    movslq %rax, %r10			# r10 = current number
+    movq %rax, %r10			# r10 = current number
 
 # restore all values in backup
     movq  -32(%rbp), %r8
-    movq  -40(rbp), %r9
-    movq  -48(rbp), %rsi
-    movq  -56(rbp), %rdx
+    movq  -40(%rbp), %r9
+    movq  -48(%rbp), %rsi
+    movq  -56(%rbp), %rdx
     movq  -64(%rbp), %rdi
 
 # compare with sign the current number with limit and load indication to r11.
 # -24(rbp) = indication for EOF
-    movq -24(rbp), %r11
+    movq -24(%rbp), %r11
     leaq -128(%rbp), %rsi 			# prepare for another iteration
-    cmpq %r10, -16(rbp)
+    cmpq %r10, -16(%rbp)
     jl update_counter_HW3		# jumps if limit < current number (signed)
     jmp read_loop_HW3			# find the next number	
 
@@ -90,6 +90,6 @@ end_count_above_HW3:
     movq $3, rax				#system code for close file
     syscall
     movq %r9, %rax
-    addq $128, $rsp
-    popq $rbp
+    addq $128, %rsp
+    popq %rbp
     ret
