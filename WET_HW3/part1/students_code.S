@@ -1,4 +1,4 @@
-.global _start
+.global count_above
 
 .section .text
 count_above:
