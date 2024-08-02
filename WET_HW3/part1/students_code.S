@@ -87,7 +87,7 @@ continue_reading_HW3:
 
 # close file, set return value, restore callee backups and pop return address
 end_count_above_HW3:
-    movq $3, rax				#system code for close file
+    movq $3, %rax				#system code for close file
     syscall
     movq %r9, %rax
     addq $128, %rsp
