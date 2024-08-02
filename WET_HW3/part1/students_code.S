@@ -41,11 +41,11 @@ read_loop:
     jz done_reading          # If zero, end of file
 
     # Compare byte with separator
-    cmp %cl, (%r11)
+    movb (%r11), %al         # Load byte from file to AL
+    cmp %cl, %al
     je separator_found
 
     # Store byte in local buffer
-    movb (%r11), %al         # Load byte from file to AL
     movb %al, (%r12)         # Store byte from AL to buffer
     add $1, %r12             # Move buffer pointer forward
     add $1, %r11             # Move moving_ptr forward
