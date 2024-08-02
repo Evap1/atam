@@ -3,8 +3,8 @@
 .section .text
 count_above:
 #prolog
-    push %rbp
-    mov %rsp, %rbp
+    pushq %rbp
+    movq %rsp, %rbp
 # allocate space for local variables
     subq $128, %rsp
 
@@ -14,7 +14,7 @@ count_above:
     movb %dil, -8(%rbp)
     movq %rsi, -16(%rbp)
     call get_path 			# return value - stored in rax - is the path to the file to read
-    mov %rax, %rdi           # move the returned value to rdi for the following syscall (pathname argument)
+    movq %rax, %rdi           # move the returned value to rdi for the following syscall (pathname argument)
 
 # open the file
     movq $2, %rax
