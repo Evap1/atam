@@ -22,7 +22,7 @@ count_above:
     movq $0, %rdx
     syscall
     movq %rax, %rdi		# store the file descriptor for further use
- 
+
     leaq -128(%rbp), %rsi		# prepare to read: send to read to buffer
     xor %r9, %r9 			# r9 = counter = 0
 
@@ -39,7 +39,7 @@ read_loop_HW3:
 
 # r8d = current read byte
     movb (%rsi), %r8b
-	
+
 # check if the read byte if the separator 
     cmpb -8(%rbp),  %r8b
     jne continue_reading_HW3
