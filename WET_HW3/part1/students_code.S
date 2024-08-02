@@ -71,6 +71,8 @@ convert_str_num_HW3:
     leaq -128(%rbp), %rsi 			# prepare for another iteration
     cmpq %r10, -16(%rbp)
     jl update_counter_HW3		# jumps if limit < current number (signed)
+    testq %r11, %r11
+    je end_count_above_HW3		# if EOF - end
     jmp read_loop_HW3			# find the next number	
 
 # r9 = counter
