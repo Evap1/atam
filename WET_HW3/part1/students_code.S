@@ -43,13 +43,14 @@ read_loop:
     jz done_reading          # If zero, end of file
 
     # Compare byte with separator
-    cmp %cl, (%rsi)
+    cmp %cl, (%r11)
     je separator_found
 
     # Store byte in local buffer
-    movb (%rsi), (%r12)     # Store byte from file to buffer
-    add $1, %r12            # Move buffer pointer forward
-    add $1, %r11            # Move moving_ptr forward
+    movb (%r11), %al         # Load byte from file to AL
+    movb %al, (%r12)         # Store byte from AL to buffer
+    add $1, %r12             # Move buffer pointer forward
+    add $1, %r11             # Move moving_ptr forward
     jmp read_loop
 
 separator_found:
@@ -57,7 +58,7 @@ separator_found:
     movb $0, (%r12)         # Null-terminate the segment (writing zero to buffer)
 
     # Call atam_atol
-    lea 20(%rsp), %rdi      # Pass the address of the buffer (offset from stack pointer)
+    lea (%rsp), %rdi        # Pass the address of the buffer (stack pointer)
     call atam_atol
     mov %rax, %rsi          # Move the returned value to rsi
 
@@ -71,11 +72,11 @@ separator_found:
 move_start_ptr:
     # Reset buffer pointer
     mov %rsp, %r12          # Reset buffer pointer to start of buffer
-    add $20, %r12           # Skip the buffer size
 
     # Update start_ptr to the current position
     mov %r11, %r10          # Update start_ptr to the new position
     jmp read_loop
+
 
 done_reading:
     # Restore stack pointer and close the file
