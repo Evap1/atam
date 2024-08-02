@@ -1,6 +1,4 @@
 .global count_above
-.extern get_path
-.extern atam_atol
 
 .section .text
 count_above:
