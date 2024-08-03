@@ -14,7 +14,7 @@ void my_store_idt(struct desc_ptr *idtr) {
 // Swap to the new IDTR
 // input : new_idtr
 void my_load_idt(struct desc_ptr *idtr) {
-  asn volatile(   
+  asm volatile(   
     "lidt %0" :    // asm code  
     :              // output 
     : "m"(*idtr)   // input - (src) load 10 bytes starting at *idtr (from the memory) to the register IDTR
