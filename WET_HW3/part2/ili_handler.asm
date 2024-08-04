@@ -26,10 +26,12 @@ my_ili_handler:
   cmpb $0x0f, %cl
   jne one_byte_HW3                  # if MSB byte is not 0f then it is only one byte
   movq $1 , %r11                    # r11 = 1 (two bytes)
+  jmp two_byte_HW3
 
   ####### 2. call what_to_do  #######
 # in case of two bytes - send the lsb byte
 two_byte_HW3:
+  movq 56(%rsp), %rcx           # reload opcode
   movb %ch, %dil                # move the second byte of opcode to %dil (for %rdi)
   pushq %r11                        # caller backup
   pushq %rdi                        # caller backup
@@ -43,6 +45,7 @@ one_byte_HW3:
   pushq %rdi                        # caller backup
   pushq %rcx                        # caller backup
   call what_to_do
+  jmp return_what_to_do_HW3
 
   ####### 3. check return value of what_to_do and use the right handler  #######
 return_what_to_do_HW3:
