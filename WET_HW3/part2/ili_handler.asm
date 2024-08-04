@@ -22,8 +22,8 @@ my_ili_handler:
   movq (%rcx), %rcx
 
   # check if opcode is 1 or 2 bytes 
-  cmpb $0x0f, %cl
   xorq %r11, %r11                   # r11 = 0 (one byte)
+  cmpb $0x0f, %cl
   je one_byte_HW3
   movq $1 , %r11                    # r11 = 1 (two bytes)
 
