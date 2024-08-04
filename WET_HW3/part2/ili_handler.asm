@@ -5,18 +5,18 @@
 # this function is both caller (to what_to_do) meaning : can assume what_to_do will recover rbx,rsp,rbp,r12,r13,r14,r15 but rax, rdi,rsi,rdx,rcx,r8,r9,r10,r11 might be overriden.
 # and callee (by main) meaning : can override rax, rdi,rsi,rdx,rcx,r8,r9,r10,r11 without backup.
 my_ili_handler:
-  ####### backup only registers that handler will change #######
+  ####### backup caller registers #######
   pushq %rax
-  pushq %rdi
   pushq %rcx
   pushq %r11
+  pushq %rdi
 
   ####### 1. diagnose interupt #######
   # save the opcode in %rcx - error code is transferred where rsp is pointed in handler stack
   # assume the wrong opcode is at most 2 bytes - stored in cx
   xorq %rcx, %rcx
   xorq %rdi, %rdi
-  movq 32(%rsp), %rcx
+  movq 8(%rsp), %rcx
   movq (%rcx), %rcx
 
   # check if opcode is 1 or 2 bytes 
@@ -29,33 +29,27 @@ my_ili_handler:
   ####### 2. call what_to_do  #######
 # in case of two bytes - send the lsb byte
 two_byte_HW3:
-  movq 32(%rsp), %rcx
+  movq 8(%rsp), %rcx
   movb 1(%rcx), %dil                # move the second byte of opcode to %dil (for %rdi)
-  pushq %r11                        # caller backup
-  pushq %rdi                        # caller backup
   call what_to_do
   jmp return_what_to_do_HW3
 
 one_byte_HW3:
   movb %cl, %dil                    # move the only byte of opcode to %dil (for %rdi)
-  pushq %r11                        # caller backup
-  pushq %rdi                        # caller backup
   call what_to_do
   jmp return_what_to_do_HW3
 
   ####### 3. check return value of what_to_do and use the right handler  #######
 return_what_to_do_HW3:
-  popq %rdi                          # caller restore
-  popq %r11                         # caller restore
   testq %rax, %rax                  # check if return value is 0 
   je original_handler_HW3
   
 new_handler_HW3:
+  popq %rdi
   movq %rax, %rdi                  # store the return value at rdi
-# restore registers
+# restore caller registers
   popq %r11
   popq %rcx
-  popq %rdi
   popq %rax
 
 # prepare to return from handler by cases:
@@ -72,9 +66,9 @@ two_byte_forward_HW3:
 
 original_handler_HW3: 
 # restore caller registers
+  popq %rdi
   popq %r11
   popq %rcx
-  popq %rdi
   popq %rax
 
   jmp *old_ili_handler              # old_ili_handler is a pointer to the original handler
