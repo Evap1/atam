@@ -40,6 +40,7 @@ two_byte_HW3:
   jmp return_what_to_do_HW3
 
 one_byte_HW3:
+  movq 56(%rsp), %rcx           # reload opcode
   movb %cl, %dil                    # move the only byte of opcode to %dil (for %rdi)
   pushq %r11                        # caller backup
   pushq %rdi                        # caller backup
