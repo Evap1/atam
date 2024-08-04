@@ -1,22 +1,25 @@
-#!/bin/bash
+obj-m += ili.o
+ili-objs += ili_main.o ili_utils.o ili_handler.o
 
-echo
-echo '[*] Compiling'
-echo
-make clean && make
+all: ili.ko bad_inst bad_inst_2 bad_inst_3
 
-echo
-echo '[*] Copying "ili.ko", "bad_inst" into VM'
-echo
-sudo mkdir _fs
-sudo mount filesystem.img _fs
-echo 'mounting...'
-sleep 5
-sudo cp -f ili.ko bad_inst bad_inst_2 bad_inst_3 _fs/root/
-echo 'umounting...'
-sudo umount _fs
-sudo rm -rf _fs
+ili.ko:
+	make -C /lib/modules/$(shell uname -r)/build M=$(shell pwd) modules
+clean:
+	make -C /lib/modules/$(shell uname -r)/build M=$(shell pwd) clean
+	rm -f bad_inst bad_inst_2 bad_inst_3
 
-echo
-echo '[*] Done'
-echo
+bad_inst: inst_test.asm
+	as -o $@.o $^
+	ld -o $@ $@.o
+
+bad_inst_2: inst_test_2.asm
+	as -o $@.o $^
+	ld -o $@ $@.o
+
+bad_inst_3: inst_test_3.asm
+	as -o $@.o $^
+	ld -o $@ $@.o
+
+$(KBUILD_EXTMOD)/ili_handler.o: ili_handler.asm
+	as -o $@ $^
