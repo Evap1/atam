@@ -12,6 +12,7 @@ my_ili_handler:
   # save the opcode in %rcx - error code is transferred where rsp is pointed in handler stack
   # assume the wrong opcode is at most 2 bytes - stored in cx
   xorq %rcx, %rcx
+  xorq %rdi, %rdi
   movq 8(%rsp), %rcx
   movq (%rcx), %rcx
 
