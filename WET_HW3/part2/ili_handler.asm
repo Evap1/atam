@@ -2,8 +2,8 @@
 
 .text
 .align 4, 0x90
-# this function is both caller (to what_to_do) and callee (by main)
-# we dont know what calle registers what_to_do could override so we backup them all 
+# this function is both caller (to what_to_do) meaning : can assume what_to_do will recover rbx,rsp,rbp,r12,r13,r14,r15 but rax, rdi,rsi,rdx,rcx,r8,r9,r10,r11 might be overriden.
+# and callee (by main) meaning : can override rax, rdi,rsi,rdx,rcx,r8,r9,r10,r11 without backup.
 my_ili_handler:
   ####### backup callee registers #######
   pushq %rbx
