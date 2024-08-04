@@ -29,7 +29,7 @@ my_ili_handler:
   ####### 2. call what_to_do  #######
 # in case of two bytes - send the lsb byte
 two_byte_HW3:
-  movq 8(%rsp), %rcx
+  movq 24(%rsp), %rcx
   movb 1(%rcx), %dil                # move the second byte of opcode to %dil (for %rdi)
   pushq %rdi                        # caller backup
   call what_to_do
