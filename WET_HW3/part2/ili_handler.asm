@@ -24,7 +24,7 @@ my_ili_handler:
   # check if opcode is 1 or 2 bytes 
   xorq %r11, %r11                   # r11 = 0 (one byte)
   cmpb $0x0f, %cl
-  je one_byte_HW3
+  jne one_byte_HW3                  # if MSB byte is not 0f then it is only one byte
   movq $1 , %r11                    # r11 = 1 (two bytes)
 
   ####### 2. call what_to_do  #######
