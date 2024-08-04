@@ -3,23 +3,27 @@
 // Store the old IDTR interrupt descriptor table register 
 // input : old_idtr
 void my_store_idt(struct desc_ptr *idtr) {
-  asm volatile(
-    "sidt %0" :    // asm code  
-    "=m"(*idtr) :  // output - (dest) store in the memory pointed by idtr the old IDTR
-    :              // input
-    :              // clobbered registers
-    );
+  asm volatile("sidt %0":"=m"(*idtr):::);
+
+  // asm volatile(
+  //   "sidt %0" :    // asm code  
+  //   "=m"(*idtr) :  // output - (dest) store in the memory pointed by idtr the old IDTR
+  //   :              // input
+  //   :              // clobbered registers
+  //   );
 }
 
 // Swap to the new IDTR
 // input : new_idtr
 void my_load_idt(struct desc_ptr *idtr) {
-  asm volatile(   
-    "lidt %0" :    // asm code  
-    :              // output 
-    : "m"(*idtr)   // input - (src) load 10 bytes starting at *idtr (from the memory) to the register IDTR
-    :              // clobbered registers
-    );
+  asm volatile("lidt %0"::"m"(*idtr)::);
+  
+    // asm volatile(   
+    // "lidt %0" :    // asm code  
+    // :              // output 
+    // "m"(*idtr) :    // input - (src) load 10 bytes starting at *idtr (from the memory) to the register IDTR
+    // :              // clobbered registers
+    // );
 }
 
 // Replace INVALID OPCODE handler address with my_ili_handler
