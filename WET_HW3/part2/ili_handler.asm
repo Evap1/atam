@@ -16,7 +16,7 @@ my_ili_handler:
   # assume the wrong opcode is at most 2 bytes - stored in cx
   xorq %rcx, %rcx
   xorq %rdi, %rdi
-  movq 8(%rsp), %rcx
+  movq 32(%rsp), %rcx
   movq (%rcx), %rcx
 
   # check if opcode is 1 or 2 bytes 
@@ -29,7 +29,7 @@ my_ili_handler:
   ####### 2. call what_to_do  #######
 # in case of two bytes - send the lsb byte
 two_byte_HW3:
-  movq 8(%rsp), %rcx
+  movq 32(%rsp), %rcx
   movb 1(%rcx), %dil                # move the second byte of opcode to %dil (for %rdi)
   call what_to_do
   jmp return_what_to_do_HW3
