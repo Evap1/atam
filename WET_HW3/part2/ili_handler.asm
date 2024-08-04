@@ -26,25 +26,32 @@ my_ili_handler:
   xorq %r11, %r11                   # r11 = 0 (one byte)
   je one_byte_HW3
   movq $1 , %r11                    # r11 = 1 (two bytes)
-  pushq %r11                        # caller backup
 
   ####### 2. call what_to_do  #######
 # in case of two bytes - send the lsb byte
 two_byte_HW3:
   movb 1(%rcx), %dil                # move the second byte of opcode to %dil (for %rdi)
+  pushq %r11                        # caller backup
+  pushq %rdi                        # caller backup
+  pushq %rcx                        # caller backup
   call what_to_do
   jmp return_what_to_do_HW3
 
 one_byte_HW3:
   movb %cl, %dil                    # move the only byte of opcode to %dil (for %rdi)
+  pushq %r11                        # caller backup
+  pushq %rdi                        # caller backup
+  pushq %rcx                        # caller backup
   call what_to_do
 
   ####### 3. check return value of what_to_do and use the right handler  #######
 return_what_to_do_HW3:
+  popq %rcx                            # caller restore
+  popq %rdi                          # caller restore
   popq %r11                         # caller restore
   testq %rax, %rax                  # check if return value is 0 
   je original_handler_HW3
-
+  
 new_handler_HW3:
 # restore callee registers
   popq %r15
