@@ -7,13 +7,16 @@
 my_ili_handler:
   ####### backup caller registers #######
   pushq %rax
+  pushq %r11                        # caller backup
+  pushq %rcx                        # caller backup
+
 
   ####### 1. diagnose interupt #######
   # save the opcode in %rcx - error code is transferred where rsp is pointed in handler stack
   # assume the wrong opcode is at most 2 bytes - stored in cx
   xorq %rcx, %rcx
   xorq %rdi, %rdi
-  movq 8(%rsp), %rcx
+  movq 24(%rsp), %rcx
   movq (%rcx), %rcx
 
   # check if opcode is 1 or 2 bytes 
@@ -28,31 +31,27 @@ my_ili_handler:
 two_byte_HW3:
   movq 8(%rsp), %rcx
   movb 1(%rcx), %dil                # move the second byte of opcode to %dil (for %rdi)
-  pushq %r11                        # caller backup
   pushq %rdi                        # caller backup
-  pushq %rcx                        # caller backup
   call what_to_do
   jmp return_what_to_do_HW3
 
 one_byte_HW3:
   movb %cl, %dil                    # move the only byte of opcode to %dil (for %rdi)
-  pushq %r11                        # caller backup
   pushq %rdi                        # caller backup
-  pushq %rcx                        # caller backup
   call what_to_do
   jmp return_what_to_do_HW3
 
   ####### 3. check return value of what_to_do and use the right handler  #######
 return_what_to_do_HW3:
-  popq %rcx                            # caller restore
   popq %rdi                          # caller restore
-  popq %r11                         # caller restore
   testq %rax, %rax                  # check if return value is 0 
   je original_handler_HW3
   
 new_handler_HW3:
   movq %rax, %rdi                  # store the return value at rdi
 # restore caller registers
+  popq %rcx
+  popq %r11
   popq %rax
 
 # prepare to return from handler by cases:
@@ -69,6 +68,8 @@ two_byte_forward_HW3:
 
 original_handler_HW3: 
 # restore caller registers
+  popq %rcx
+  popq %r11
   popq %rax
 
   jmp *old_ili_handler              # old_ili_handler is a pointer to the original handler
