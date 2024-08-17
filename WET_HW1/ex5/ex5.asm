@@ -6,6 +6,8 @@ _start:
   movl size, %ecx              
   subl $1, %ecx
 
+  #initial seconddegree to zero
+  movl $0, seconddegree
   # check if size -1 < 3-1, if so, set seconddegree to 1 and exit
   cmpl $2, %ecx
   jl update_seconddegree_HW1
