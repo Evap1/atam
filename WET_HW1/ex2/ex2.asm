@@ -8,17 +8,17 @@ _start:
     movq size, %r13      
     shrq $3, %r13           # divide size by 8 (size/8)
     andq $7, %r9             # check if size is divisible by 8
-    testq %r9, %r9          
+    testq %r9, %r9
+    movq $0, %r11
     jne update_type1_HW1     # if not divisible jump to check simple condition
 
 loop_zeros_HW1:
-    movq $0, %r11
     movq 0(%r10, %r11, 8), %r12 
     testq %r12, %r12         # check if quad value is 0
     je update_type1_HW1
     addq $1, %r11           
     cmpq %r11, %r13        
-    jb loop_zeros_HW1        # loop if index < size
+    ja loop_zeros_HW1        # loop if index < size
 
     cmpb $3, type            
     je end                
